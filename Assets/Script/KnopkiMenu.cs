@@ -28,4 +28,12 @@ public class KnopkiMenu : MonoBehaviour
     {
         Application.Quit();//Полностью выход из игры
     }
+    public void Man()//Для кнопки битва
+    {
+        SceneManager.LoadScene(1);//Запускается сцена игры
+    }
+    public void Woman()//Для кнопки разукрашка
+    {
+        SceneManager.LoadScene(2);//Запускается сцена игры
+    }
 }

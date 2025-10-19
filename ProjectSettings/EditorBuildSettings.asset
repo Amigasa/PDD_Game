@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Menu.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 1
-    path: Assets/Scenes/Rejimi.unity
-    guid: d297903b8b11e4e478d49e342ebff391
+    path: Assets/Scenes/Man.unity
+    guid: eee9be1f4bcee5143858b3a5acfb721e
+  - enabled: 1
+    path: Assets/Scenes/Woman.unity
+    guid: 9e45cec2815817d47ae1ee79247fa249
   m_configObjects: {}
