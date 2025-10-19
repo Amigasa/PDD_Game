@@ -199,6 +199,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 137742231}
+  - component: {fileID: 137742232}
   m_Layer: 0
   m_Name: knopki
   m_TagString: Untagged
@@ -221,6 +222,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &137742232
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 137742230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1c66c6b0bad4ba4f91893eac13021c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MenuPanel: {fileID: 465578727}
+  RejimiPanel: {fileID: 1362868798}
 --- !u!1 &249551655
 GameObject:
   m_ObjectHideFlags: 0
@@ -437,7 +452,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 356689655}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 137742232}
+        m_TargetAssemblyTypeName: KnopkiMenu, Assembly-CSharp
+        m_MethodName: Play
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &356689655
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -610,7 +637,7 @@ GameObject:
   - component: {fileID: 465578729}
   m_Layer: 5
   m_Name: MenuPanel
-  m_TagString: Untagged
+  m_TagString: MenuPanel
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1230,7 +1257,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1189199998}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 137742232}
+        m_TargetAssemblyTypeName: KnopkiMenu, Assembly-CSharp
+        m_MethodName: Ex
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1189199998
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1519,7 +1558,7 @@ GameObject:
   - component: {fileID: 1362868800}
   m_Layer: 5
   m_Name: RejimiPanel
-  m_TagString: Untagged
+  m_TagString: RejimiPanel
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1800,7 +1839,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1820959904}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 137742232}
+        m_TargetAssemblyTypeName: KnopkiMenu, Assembly-CSharp
+        m_MethodName: Exit
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1820959904
 MonoBehaviour:
   m_ObjectHideFlags: 0
