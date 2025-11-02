@@ -36,4 +36,8 @@ public class KnopkiMenu : MonoBehaviour
     {
         SceneManager.LoadScene(2);//Запускается сцена игры
     }
+    public void ExMenu()//Для кнопки выхода в меню
+    {
+        SceneManager.LoadScene(0);//Запускается сцена меню
+    }
 }
