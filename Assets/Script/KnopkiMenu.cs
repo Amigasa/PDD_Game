@@ -40,4 +40,20 @@ public class KnopkiMenu : MonoBehaviour
     {
         SceneManager.LoadScene(0);//Запускается сцена меню
     }
+    public void Man_1_lvl()//Для кнопки 1 лвл битва
+    {
+        SceneManager.LoadScene(3);//Запускается сцена игры
+    }
+    public void Man_2_lvl()//Для кнопки 2 лвл битва
+    {
+        SceneManager.LoadScene(4);//Запускается сцена игры
+    }
+    public void Woman_1_lvl()//Для кнопки 1 лвл разукрашка
+    {
+        SceneManager.LoadScene(5);//Запускается сцена игры
+    }
+    public void Woman_2_lvl()//Для кнопки 2 лвл разукрашка
+    {
+        SceneManager.LoadScene(6);//Запускается сцена игры
+    }
 }
