@@ -56,4 +56,10 @@ public class KnopkiMenu : MonoBehaviour
     {
         SceneManager.LoadScene(6);//Запускается сцена игры
     }
+    public void OnRestartButton()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene(
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex
+        );
+    }
 }
