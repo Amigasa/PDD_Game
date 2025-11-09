@@ -19,15 +19,26 @@ public class BattleLevelController : MonoBehaviour
     public GameObject victoryPanel;
     public GameObject defeatPanel;
 
+    [Header("Stars Display")]
+    public GameObject[] victoryStars; // 3 звезды на панели победы
+    public TMP_Text victoryText;
+
     [Header("Game Settings")]
     public int totalQuestions = 5;
+    public string levelId = "Battle_Level_1"; // Уникальный ID уровня
 
     private int currentQuestion = 0;
     private int correctAnswer;
     private bool isGameActive = true;
+    private int starsEarned = 0;
 
     void Start()
     {
+        // Загружаем ID текущего уровня
+        if (string.IsNullOrEmpty(levelId))
+        {
+            levelId = PlayerPrefs.GetString("CurrentLevel", "Battle_Level_1");
+        }
         GenerateQuestion();
         UpdateHearts();
     }
@@ -173,13 +184,50 @@ public class BattleLevelController : MonoBehaviour
             enemyHearts[i].SetActive(i < enemyHealth);
         }
     }
+    IEnumerator AnimateStars()
+    {
+        for (int i = 0; i < victoryStars.Length; i++)
+        {
+            if (i < starsEarned)
+            {
+                victoryStars[i].SetActive(true);
+                victoryStars[i].transform.localScale = Vector3.zero;
+
+                // Анимация увеличения
+                float duration = 0.5f;
+                float elapsed = 0f;
+                while (elapsed < duration)
+                {
+                    victoryStars[i].transform.localScale = Vector3.one * (elapsed / duration);
+                    elapsed += Time.deltaTime;
+                    yield return null;
+                }
+
+                victoryStars[i].transform.localScale = Vector3.one;
+            }
+            yield return new WaitForSeconds(0.2f);
+        }
+    }
 
     void Victory()
     {
         isGameActive = false;
+        starsEarned = CalculateStars();
+
+        // Показываем звезды на панели победы
+        StartCoroutine(AnimateStars());
+
         victoryPanel.SetActive(true);
         // Сохраняем прогресс
         SaveManager.Instance.SaveLevelProgress("Battle_Level_1", CalculateStars());
+    }
+
+    int CalculateStars()
+    {
+        // Победил и осталась 1 жизнь - 1 звезда
+        // Победил и осталось 2 жизни - 2 звезды  
+        // Победил и осталось 3 жизни - 3 звезды
+        return playerHealth;
     }
 
     void Defeat()
@@ -194,13 +242,6 @@ public class BattleLevelController : MonoBehaviour
         // Можно сделать отдельную панель для ничьи или считать победой
         victoryPanel.SetActive(true);
         SaveManager.Instance.SaveLevelProgress("Battle_Level_1", 1); // 1 звезда за ничью
-    }
-
-    int CalculateStars()
-    {
-        if (playerHealth == 3) return 3;
-        if (playerHealth == 2) return 2;
-        return 1;
     }
 
     // Кнопки для UI
