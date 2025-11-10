@@ -42,6 +42,22 @@ public class BattleLevelController : MonoBehaviour
         GenerateQuestion();
         UpdateHearts();
     }
+    void SaveLevelProgress(string levelId, int stars)
+    {
+        int currentSlot = PlayerPrefs.GetInt("CurrentSaveSlot", 0);
+        PlayerPrefs.SetInt($"SaveSlot_{currentSlot}_{levelId}_Stars", stars);
+        PlayerPrefs.SetInt($"SaveSlot_{currentSlot}_{levelId}_Completed", 1);
+        PlayerPrefs.Save();
+    }
+
+    LevelProgress LoadLevelProgress(string levelId)
+    {
+        int currentSlot = PlayerPrefs.GetInt("CurrentSaveSlot", 0);
+        LevelProgress progress = new LevelProgress();
+        progress.starsEarned = PlayerPrefs.GetInt($"SaveSlot_{currentSlot}_{levelId}_Stars", 0);
+        progress.isCompleted = PlayerPrefs.GetInt($"SaveSlot_{currentSlot}_{levelId}_Completed", 0) == 1;
+        return progress;
+    }
 
     void GenerateQuestion()
     {

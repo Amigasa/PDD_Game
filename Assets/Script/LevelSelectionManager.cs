@@ -1,33 +1,29 @@
-using UnityEngine;
+п»їusing UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 
 public class LevelSelectionManager : MonoBehaviour
 {
     [System.Serializable]
     public class LevelInfo
     {
-        public string levelId;        // "Battle_Level_1", "Battle_Level_2"...
-        public Button levelButton;    // Кнопка уровня
-        public GameObject[] stars;    // 3 звезды под кнопкой
-        public TMP_Text levelText;    // Текст на кнопке (1, 2, 3...)
+        public string levelId;
+        public Button levelButton;
+        public GameObject[] stars;
+        public TMP_Text levelText;
     }
 
     [Header("Level Settings")]
     public LevelInfo[] levels;
 
-    [Header("UI References")]
-    public Button backButton;
-
     void Start()
     {
-        InitializeLevels();
-        SetupButtonListeners();
+        RefreshAllLevels();
     }
 
-    void InitializeLevels()
+    public void RefreshAllLevels()
     {
+        // РћР±РЅРѕРІР»СЏРµРј РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ РІСЃРµС… СѓСЂРѕРІРЅРµР№ РЅР° РѕСЃРЅРѕРІРµ С‚РµРєСѓС‰РµРіРѕ СЃР»РѕС‚Р°
         for (int i = 0; i < levels.Length; i++)
         {
             UpdateLevelDisplay(i);
@@ -37,66 +33,50 @@ public class LevelSelectionManager : MonoBehaviour
     void UpdateLevelDisplay(int levelIndex)
     {
         LevelInfo level = levels[levelIndex];
-        int starsEarned = PlayerPrefs.GetInt(level.levelId + "_stars", 0);
-        bool isCompleted = PlayerPrefs.GetInt(level.levelId + "_completed", 0) == 1;
+        LevelProgress progress = SlotSaveSystem.LoadLevelProgress(level.levelId);
         bool isUnlocked = IsLevelUnlocked(levelIndex);
 
-        // Обновляем звезды
+        // РћР±РЅРѕРІР»СЏРµРј Р·РІРµР·РґС‹
         for (int starIndex = 0; starIndex < level.stars.Length; starIndex++)
         {
             if (level.stars[starIndex] != null)
             {
-                level.stars[starIndex].SetActive(starIndex < starsEarned);
+                level.stars[starIndex].SetActive(starIndex < progress.starsEarned);
             }
         }
 
-        // Настраиваем кнопку
+        // РќР°СЃС‚СЂР°РёРІР°РµРј РєРЅРѕРїРєСѓ
         if (level.levelButton != null)
         {
             level.levelButton.interactable = isUnlocked;
 
-            // Визуальная индикация пройденных уровней
+            // Р’РёР·СѓР°Р»СЊРЅР°СЏ РёРЅРґРёРєР°С†РёСЏ
             Image buttonImage = level.levelButton.GetComponent<Image>();
             if (buttonImage != null)
             {
-                if (isCompleted)
-                    buttonImage.color = Color.green; // Пройден
+                if (progress.isCompleted)
+                    buttonImage.color = Color.green;
                 else if (isUnlocked)
-                    buttonImage.color = Color.white; // Доступен
+                    buttonImage.color = Color.white;
                 else
-                    buttonImage.color = Color.gray;  // Заблокирован
+                    buttonImage.color = Color.gray;
             }
+        }
+
+        // РћР±РЅРѕРІР»СЏРµРј С‚РµРєСЃС‚ СѓСЂРѕРІРЅСЏ
+        if (level.levelText != null)
+        {
+            level.levelText.text = progress.isCompleted ? "вњ“" : (levelIndex + 1).ToString();
         }
     }
 
     bool IsLevelUnlocked(int levelIndex)
     {
-        // Первый уровень всегда доступен
         if (levelIndex == 0) return true;
 
-        // Уровень доступен если предыдущий пройден
+        // РЈСЂРѕРІРµРЅСЊ РґРѕСЃС‚СѓРїРµРЅ РµСЃР»Рё РїСЂРµРґС‹РґСѓС‰РёР№ РїСЂРѕР№РґРµРЅ РІ РўР•РљРЈР©Р•Рњ РЎР›РћРўР•
         string previousLevelId = levels[levelIndex - 1].levelId;
-        return PlayerPrefs.GetInt(previousLevelId + "_completed", 0) == 1;
-    }
-
-    void SetupButtonListeners()
-    {
-        // Назначаем обработчики для кнопок уровней
-        for (int i = 0; i < levels.Length; i++)
-        {
-            int levelIndex = i; // Важно для замыкания
-            if (levels[i].levelButton != null)
-            {
-                levels[i].levelButton.onClick.RemoveAllListeners();
-                levels[i].levelButton.onClick.AddListener(() => LoadLevel(levelIndex));
-            }
-        }
-
-        // Кнопка "Выйти"
-        if (backButton != null)
-        {
-            backButton.onClick.RemoveAllListeners();
-        }
+        return SlotSaveSystem.LoadLevelProgress(previousLevelId).isCompleted;
     }
 
     public void LoadLevel(int levelIndex)
@@ -104,24 +84,13 @@ public class LevelSelectionManager : MonoBehaviour
         if (levelIndex < 0 || levelIndex >= levels.Length) return;
 
         string levelId = levels[levelIndex].levelId;
-        Debug.Log($"Загрузка уровня: {levelId}");
+        Debug.Log($"Р—Р°РіСЂСѓР·РєР° СѓСЂРѕРІРЅСЏ: {levelId} РґР»СЏ СЃР»РѕС‚Р° {SlotSaveSystem.GetCurrentSlot()}");
 
-
-        // Сохраняем текущий уровень для загрузки в BattleLevelController
+        // РЎРѕС…СЂР°РЅСЏРµРј С‚РµРєСѓС‰РёР№ СѓСЂРѕРІРµРЅСЊ РґР»СЏ Р·Р°РіСЂСѓР·РєРё
         PlayerPrefs.SetString("CurrentLevel", levelId);
         PlayerPrefs.Save();
-    }
 
-    // Обновить отображение (вызвать при возвращении в меню)
-    public void RefreshLevels()
-    {
-        InitializeLevels();
-    }
-    public void ShowLevelPreview(int levelIndex)
-    {
-        // Показывать информацию об уровне (лучший результат и т.д.)
-        LevelInfo level = levels[levelIndex];
-        int stars = PlayerPrefs.GetInt(level.levelId + "_stars", 0);
-        Debug.Log($"Уровень {levelIndex + 1}: {stars} звезд");
+        // Р—Р°РіСЂСѓР¶Р°РµРј СЃС†РµРЅСѓ Р±РёС‚РІС‹
+        UnityEngine.SceneManagement.SceneManager.LoadScene("BattleScene");
     }
 }
