@@ -8,8 +8,8 @@ using UnityEngine.SceneManagement;
 public class KnopkiMenu : MonoBehaviour
 {
     [SerializeField] private GameObject SavePanel;
-    [SerializeField] private GameObject MenuPanel;//ѕанель главного меню
-    [SerializeField] private GameObject RejimiPanel;//ѕанель режимов
+    [SerializeField] private GameObject MenuPanel;
+    [SerializeField] private GameObject RejimiPanel;
 
     void Update()
     {
@@ -17,8 +17,8 @@ public class KnopkiMenu : MonoBehaviour
     }
     public void Ex()// нопка назад дл€ выхода в меню
     {
-        RejimiPanel.SetActive(false);//ќтключаетс€ панель режимов
-        SavePanel.SetActive(true);//¬ключаетс€ главное меню
+        RejimiPanel.SetActive(false);
+        SavePanel.SetActive(true);
     }
     public void Exit()// нопка выхода в главном меню
     {

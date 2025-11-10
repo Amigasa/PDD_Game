@@ -3,6 +3,13 @@ using TMPro;
 using UnityEngine.UI;
 using System.Collections;
 
+[System.Serializable]
+public class LevelProgress
+{
+    public int starsEarned;
+    public bool isCompleted;
+}
+
 public class BattleLevelController : MonoBehaviour
 {
     [Header("Player & Enemy")]
@@ -20,12 +27,12 @@ public class BattleLevelController : MonoBehaviour
     public GameObject defeatPanel;
 
     [Header("Stars Display")]
-    public GameObject[] victoryStars; // 3 звезды на панели победы
+    public GameObject[] victoryStars;
     public TMP_Text victoryText;
 
     [Header("Game Settings")]
     public int totalQuestions = 5;
-    public string levelId = "Battle_Level_1"; // Уникальный ID уровня
+    public string levelId = "Battle_Level_1";
 
     private int currentQuestion = 0;
     private int correctAnswer;
@@ -34,43 +41,25 @@ public class BattleLevelController : MonoBehaviour
 
     void Start()
     {
-        // Загружаем ID текущего уровня
         if (string.IsNullOrEmpty(levelId))
         {
             levelId = PlayerPrefs.GetString("CurrentLevel", "Battle_Level_1");
         }
+
         GenerateQuestion();
         UpdateHearts();
-    }
-    void SaveLevelProgress(string levelId, int stars)
-    {
-        int currentSlot = PlayerPrefs.GetInt("CurrentSaveSlot", 0);
-        PlayerPrefs.SetInt($"SaveSlot_{currentSlot}_{levelId}_Stars", stars);
-        PlayerPrefs.SetInt($"SaveSlot_{currentSlot}_{levelId}_Completed", 1);
-        PlayerPrefs.Save();
-    }
-
-    LevelProgress LoadLevelProgress(string levelId)
-    {
-        int currentSlot = PlayerPrefs.GetInt("CurrentSaveSlot", 0);
-        LevelProgress progress = new LevelProgress();
-        progress.starsEarned = PlayerPrefs.GetInt($"SaveSlot_{currentSlot}_{levelId}_Stars", 0);
-        progress.isCompleted = PlayerPrefs.GetInt($"SaveSlot_{currentSlot}_{levelId}_Completed", 0) == 1;
-        return progress;
     }
 
     void GenerateQuestion()
     {
         if (!isGameActive) return;
 
-        // Генерируем пример умножения
-        int number1 = Random.Range(2, 10); // от 2 до 9
+        int number1 = Random.Range(2, 10);
         int number2 = Random.Range(2, 10);
         correctAnswer = number1 * number2;
 
         questionText.text = $"{number1} × {number2} = ?";
 
-        // Создаем массив ответов
         int[] answers = new int[4];
         int correctIndex = Random.Range(0, 4);
 
@@ -82,7 +71,6 @@ public class BattleLevelController : MonoBehaviour
             }
             else
             {
-                // Генерируем неправильные ответы
                 int wrongAnswer;
                 do
                 {
@@ -93,11 +81,9 @@ public class BattleLevelController : MonoBehaviour
                 answers[i] = wrongAnswer;
             }
 
-            // Обновляем текст кнопок
             answerButtons[i].GetComponentInChildren<TMP_Text>().text = answers[i].ToString();
 
-            // Убираем старые обработчики и добавляем новые
-            int index = i; // важно для замыкания
+            int index = i;
             answerButtons[i].onClick.RemoveAllListeners();
             answerButtons[i].onClick.AddListener(() => OnAnswerSelected(index, answers[index]));
         }
@@ -109,13 +95,11 @@ public class BattleLevelController : MonoBehaviour
 
         if (selectedAnswer == correctAnswer)
         {
-            // Правильный ответ - атакуем монстра
             enemyHealth--;
             StartCoroutine(AttackEnemy());
         }
         else
         {
-            // Неправильный ответ - получаем урон
             playerHealth--;
             StartCoroutine(AttackPlayer());
         }
@@ -123,7 +107,6 @@ public class BattleLevelController : MonoBehaviour
         UpdateHearts();
         currentQuestion++;
 
-        // Проверяем условия победы/поражения
         if (enemyHealth <= 0)
         {
             Victory();
@@ -135,71 +118,51 @@ public class BattleLevelController : MonoBehaviour
             return;
         }
 
-        // Генерируем следующий вопрос
         if (currentQuestion < totalQuestions)
         {
             GenerateQuestion();
         }
         else
         {
-            // Если вопросы закончились, но здоровье еще есть
             if (playerHealth > enemyHealth)
                 Victory();
             else if (enemyHealth > playerHealth)
                 Defeat();
             else
-                Draw(); // Ничья
+                Draw();
         }
     }
 
     IEnumerator AttackEnemy()
     {
-        // Анимация атаки игрока
         Vector3 originalPos = player.transform.position;
         player.transform.position = originalPos + new Vector3(0.5f, 0, 0);
-
         yield return new WaitForSeconds(0.3f);
-
-        // Анимация получения урона монстром
         enemy.GetComponent<SpriteRenderer>().color = Color.red;
-
         yield return new WaitForSeconds(0.2f);
-
         player.transform.position = originalPos;
         enemy.GetComponent<SpriteRenderer>().color = Color.white;
     }
 
     IEnumerator AttackPlayer()
     {
-        // Анимация атаки монстра
         Vector3 originalPos = enemy.transform.position;
         enemy.transform.position = originalPos + new Vector3(-0.5f, 0, 0);
-
         yield return new WaitForSeconds(0.3f);
-
-        // Анимация получения урона игроком
         player.GetComponent<SpriteRenderer>().color = Color.red;
-
         yield return new WaitForSeconds(0.2f);
-
         enemy.transform.position = originalPos;
         player.GetComponent<SpriteRenderer>().color = Color.white;
     }
 
     void UpdateHearts()
     {
-        // Обновляем сердца игрока
         for (int i = 0; i < playerHearts.Length; i++)
-        {
             playerHearts[i].SetActive(i < playerHealth);
-        }
-
-        // Обновляем сердца монстра
         for (int i = 0; i < enemyHearts.Length; i++)
-        {
             enemyHearts[i].SetActive(i < enemyHealth);
-        }
     }
+
     IEnumerator AnimateStars()
     {
         for (int i = 0; i < victoryStars.Length; i++)
@@ -209,7 +172,6 @@ public class BattleLevelController : MonoBehaviour
                 victoryStars[i].SetActive(true);
                 victoryStars[i].transform.localScale = Vector3.zero;
 
-                // Анимация увеличения
                 float duration = 0.5f;
                 float elapsed = 0f;
                 while (elapsed < duration)
@@ -218,7 +180,6 @@ public class BattleLevelController : MonoBehaviour
                     elapsed += Time.deltaTime;
                     yield return null;
                 }
-
                 victoryStars[i].transform.localScale = Vector3.one;
             }
             yield return new WaitForSeconds(0.2f);
@@ -229,20 +190,25 @@ public class BattleLevelController : MonoBehaviour
     {
         isGameActive = false;
         starsEarned = CalculateStars();
-
-        // Показываем звезды на панели победы
+        SaveLevelProgress(levelId, starsEarned);
         StartCoroutine(AnimateStars());
 
+        if (victoryText != null)
+            victoryText.text = $"Победа!\nЗвезд: {starsEarned}/3";
+
         victoryPanel.SetActive(true);
-        // Сохраняем прогресс
-        SaveManager.Instance.SaveLevelProgress("Battle_Level_1", CalculateStars());
+    }
+
+    void SaveLevelProgress(string levelId, int stars)
+    {
+        int currentSlot = SimpleSlotManager.GetCurrentSlot();
+        PlayerPrefs.SetInt($"Slot_{currentSlot}_{levelId}_stars", stars);
+        PlayerPrefs.SetInt($"Slot_{currentSlot}_{levelId}_completed", 1);
+        PlayerPrefs.Save();
     }
 
     int CalculateStars()
     {
-        // Победил и осталась 1 жизнь - 1 звезда
-        // Победил и осталось 2 жизни - 2 звезды  
-        // Победил и осталось 3 жизни - 3 звезды
         return playerHealth;
     }
 
@@ -255,19 +221,25 @@ public class BattleLevelController : MonoBehaviour
     void Draw()
     {
         isGameActive = false;
-        // Можно сделать отдельную панель для ничьи или считать победой
+        starsEarned = 1;
+        SaveLevelProgress(levelId, starsEarned);
+        StartCoroutine(AnimateStars());
+
+        if (victoryText != null)
+            victoryText.text = $"Ничья!\nЗвезд: {starsEarned}/3";
+
         victoryPanel.SetActive(true);
-        SaveManager.Instance.SaveLevelProgress("Battle_Level_1", 1); // 1 звезда за ничью
     }
 
-    // Кнопки для UI
     public void RestartLevel()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
+        UnityEngine.SceneManagement.SceneManager.LoadScene(
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex
+        );
     }
 
     public void BackToMenu()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(0); // Главное меню
+        UnityEngine.SceneManagement.SceneManager.LoadScene(0);
     }
 }

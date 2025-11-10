@@ -10,7 +10,6 @@ public class LevelSelectionManager : MonoBehaviour
         public string levelId;
         public Button levelButton;
         public GameObject[] stars;
-        public TMP_Text levelText;
     }
 
     [Header("Level Settings")]
@@ -23,7 +22,6 @@ public class LevelSelectionManager : MonoBehaviour
 
     public void RefreshAllLevels()
     {
-        // Обновляем отображение всех уровней на основе текущего слота
         for (int i = 0; i < levels.Length; i++)
         {
             UpdateLevelDisplay(i);
@@ -33,50 +31,42 @@ public class LevelSelectionManager : MonoBehaviour
     void UpdateLevelDisplay(int levelIndex)
     {
         LevelInfo level = levels[levelIndex];
-        LevelProgress progress = SlotSaveSystem.LoadLevelProgress(level.levelId);
-        bool isUnlocked = IsLevelUnlocked(levelIndex);
+        int currentSlot = SimpleSlotManager.GetCurrentSlot();
+
+        int stars = PlayerPrefs.GetInt($"Slot_{currentSlot}_{level.levelId}_stars", 0);
+        bool completed = PlayerPrefs.GetInt($"Slot_{currentSlot}_{level.levelId}_completed", 0) == 1;
+        bool unlocked = IsLevelUnlocked(levelIndex);
 
         // Обновляем звезды
-        for (int starIndex = 0; starIndex < level.stars.Length; starIndex++)
+        for (int i = 0; i < level.stars.Length; i++)
         {
-            if (level.stars[starIndex] != null)
-            {
-                level.stars[starIndex].SetActive(starIndex < progress.starsEarned);
-            }
+            if (level.stars[i] != null)
+                level.stars[i].SetActive(i < stars);
         }
 
         // Настраиваем кнопку
         if (level.levelButton != null)
         {
-            level.levelButton.interactable = isUnlocked;
+            level.levelButton.interactable = unlocked;
 
-            // Визуальная индикация
             Image buttonImage = level.levelButton.GetComponent<Image>();
             if (buttonImage != null)
             {
-                if (progress.isCompleted)
-                    buttonImage.color = Color.green;
-                else if (isUnlocked)
-                    buttonImage.color = Color.white;
-                else
-                    buttonImage.color = Color.gray;
+                if (completed) buttonImage.color = Color.green;
+                else if (unlocked) buttonImage.color = Color.white;
+                else buttonImage.color = Color.gray;
             }
         }
 
-        // Обновляем текст уровня
-        if (level.levelText != null)
-        {
-            level.levelText.text = progress.isCompleted ? "✓" : (levelIndex + 1).ToString();
-        }
     }
 
     bool IsLevelUnlocked(int levelIndex)
     {
         if (levelIndex == 0) return true;
 
-        // Уровень доступен если предыдущий пройден в ТЕКУЩЕМ СЛОТЕ
+        int currentSlot = SimpleSlotManager.GetCurrentSlot();
         string previousLevelId = levels[levelIndex - 1].levelId;
-        return SlotSaveSystem.LoadLevelProgress(previousLevelId).isCompleted;
+        return PlayerPrefs.GetInt($"Slot_{currentSlot}_{previousLevelId}_completed", 0) == 1;
     }
 
     public void LoadLevel(int levelIndex)
@@ -84,13 +74,14 @@ public class LevelSelectionManager : MonoBehaviour
         if (levelIndex < 0 || levelIndex >= levels.Length) return;
 
         string levelId = levels[levelIndex].levelId;
-        Debug.Log($"Загрузка уровня: {levelId} для слота {SlotSaveSystem.GetCurrentSlot()}");
-
-        // Сохраняем текущий уровень для загрузки
         PlayerPrefs.SetString("CurrentLevel", levelId);
         PlayerPrefs.Save();
 
-        // Загружаем сцену битвы
         UnityEngine.SceneManagement.SceneManager.LoadScene("BattleScene");
+    }
+
+    public void BackToModeSelection()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("ModeSelection");
     }
 }

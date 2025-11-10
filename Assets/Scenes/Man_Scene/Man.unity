@@ -694,7 +694,6 @@ MonoBehaviour:
     - {fileID: 2061901761}
     - {fileID: 1327772894}
     levelText: {fileID: 597755171}
-  backButton: {fileID: 333698859}
 --- !u!4 &225351593
 Transform:
   m_ObjectHideFlags: 0
@@ -2112,6 +2111,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1c66c6b0bad4ba4f91893eac13021c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SavePanel: {fileID: 0}
   MenuPanel: {fileID: 0}
   RejimiPanel: {fileID: 0}
 --- !u!1 &597755169
