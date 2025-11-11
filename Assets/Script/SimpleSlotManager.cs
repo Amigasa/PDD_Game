@@ -57,7 +57,7 @@ public class SimpleSlotManager : MonoBehaviour
 
         // Переходим к выбору режима
         saveSelectionPanel.SetActive(false);
-        // Загружаем сцену выбора режима (или уровней)
+        // Загружаем панель выбора режима
         RejimiPanel.SetActive(true);
     }
 

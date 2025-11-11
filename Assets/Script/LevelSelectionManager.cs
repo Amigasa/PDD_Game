@@ -8,8 +8,10 @@ public class LevelSelectionManager : MonoBehaviour
     public class LevelInfo
     {
         public string levelId;
+        public int sceneBuildIndex;
         public Button levelButton;
         public GameObject[] stars;
+        public TMP_Text levelText;
     }
 
     [Header("Level Settings")]
@@ -74,10 +76,11 @@ public class LevelSelectionManager : MonoBehaviour
         if (levelIndex < 0 || levelIndex >= levels.Length) return;
 
         string levelId = levels[levelIndex].levelId;
+        int sceneIndex = levels[levelIndex].sceneBuildIndex;
         PlayerPrefs.SetString("CurrentLevel", levelId);
         PlayerPrefs.Save();
 
-        UnityEngine.SceneManagement.SceneManager.LoadScene("BattleScene");
+        UnityEngine.SceneManagement.SceneManager.LoadScene(sceneIndex);
     }
 
     public void BackToModeSelection()
