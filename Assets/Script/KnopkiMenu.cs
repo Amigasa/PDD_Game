@@ -37,5 +37,12 @@ public class KnopkiMenu : MonoBehaviour
     {
         Application.Quit();//Полностью выход из игры
     }
-    
+    public void Man()
+    {
+        SceneManager.LoadScene(1);
+    }
+    public void Woman()
+    {
+        SceneManager.LoadScene(2);
+    }
 }

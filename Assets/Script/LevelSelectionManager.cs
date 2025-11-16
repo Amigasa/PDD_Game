@@ -85,6 +85,6 @@ public class LevelSelectionManager : MonoBehaviour
 
     public void BackToModeSelection()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("ModeSelection");
+        UnityEngine.SceneManagement.SceneManager.LoadScene(0);
     }
 }
