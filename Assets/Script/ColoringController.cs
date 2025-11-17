@@ -168,10 +168,21 @@ public class ColoringController : MonoBehaviour
     void SaveToGallery()
     {
         int currentSlot = PlayerPrefs.GetInt("CurrentSaveSlot", 0);
+
+        // Определяем номер уровня из имени сцены
         string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-        PlayerPrefs.SetInt($"Slot_{currentSlot}_Gallery_{sceneName}", 1);
+        int levelNumber = 1; // По умолчанию первый уровень
+
+        if (sceneName.Contains("2")) levelNumber = 2;
+        else if (sceneName.Contains("3")) levelNumber = 3;
+        else if (sceneName.Contains("4")) levelNumber = 4;
+
+        // Сохраняем что уровень пройден идеально
+        string galleryKey = $"Slot_{currentSlot}_Gallery_Coloring_Level_{levelNumber}";
+        PlayerPrefs.SetInt(galleryKey, 1);
         PlayerPrefs.Save();
-        Debug.Log("Рисунок добавлен в галерею!");
+
+        Debug.Log($"Рисунок уровня {levelNumber} добавлен в галерею!");
     }
 
     // Кнопки

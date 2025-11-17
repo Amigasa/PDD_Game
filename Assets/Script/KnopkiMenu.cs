@@ -10,19 +10,16 @@ public class KnopkiMenu : MonoBehaviour
     [SerializeField] private GameObject SavePanel;
     [SerializeField] private GameObject MenuPanel;
     [SerializeField] private GameObject RejimiPanel;
-    [SerializeField] private GameObject galleryPanel;
 
     // Добавь эти методы:
     public void ShowGallery()
     {
-        MenuPanel.SetActive(false);
-        galleryPanel.SetActive(true);
+        SceneManager.LoadScene(4);
     }
 
     public void BackFromGallery()
     {
-        galleryPanel.SetActive(false);
-        MenuPanel.SetActive(true);
+        SceneManager.LoadScene(0);
     }
     void Update()
     {

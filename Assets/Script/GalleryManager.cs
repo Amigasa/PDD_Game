@@ -4,86 +4,76 @@ using TMPro;
 
 public class GalleryManager : MonoBehaviour
 {
-    [Header("Gallery UI")]
+    [Header("Галерея")]
     public GameObject galleryPanel;
     public GameObject mainMenuPanel;
-    public Transform galleryGrid;
-    public GameObject imagePreviewPrefab;
+    public Button[] galleryButtons; // 4 кнопки с изображениями
+    public GameObject[] lockIcons; // 4 иконки замков
+    public TMP_Text emptyText; // "Пока нет рисунков"
 
-    [Header("Gallery Settings")]
-    public Sprite[] coloringSprites; // Спрайты всех рисунков
+    [Header("Спрайты рисунков")]
+    public Sprite[] drawingSprites; // 4 спрайта рисунков
 
     void Start()
     {
         UpdateGallery();
     }
 
-    public void ShowGallery()
+    public void BackToModeSelection()
     {
-        mainMenuPanel.SetActive(false);
-        galleryPanel.SetActive(true);
-        UpdateGallery();
-    }
-
-    public void BackToMenu()
-    {
-        galleryPanel.SetActive(false);
-        mainMenuPanel.SetActive(true);
+        UnityEngine.SceneManagement.SceneManager.LoadScene(0);
     }
 
     void UpdateGallery()
     {
-        // Очищаем старые превью
-        foreach (Transform child in galleryGrid)
-        {
-            Destroy(child.gameObject);
-        }
-
         int currentSlot = PlayerPrefs.GetInt("CurrentSaveSlot", 0);
+        bool hasAnyDrawing = false;
 
-        // Создаем превью для каждого рисунка
-        for (int i = 0; i < coloringSprites.Length; i++)
+        // Проверяем каждый рисунок
+        for (int i = 0; i < galleryButtons.Length; i++)
         {
-            string levelId = $"Coloring_Level_{i + 1}";
-            bool isUnlocked = PlayerPrefs.GetInt($"Slot_{currentSlot}_Gallery_{levelId}", 0) == 1;
+            string levelKey = $"Slot_{currentSlot}_Gallery_Coloring_Level_{i + 1}";
+            bool isUnlocked = PlayerPrefs.GetInt(levelKey, 0) == 1;
 
-            CreateImagePreview(coloringSprites[i], isUnlocked, levelId);
-        }
-    }
-
-    void CreateImagePreview(Sprite sprite, bool isUnlocked, string levelId)
-    {
-        GameObject preview = Instantiate(imagePreviewPrefab, galleryGrid);
-        Image previewImage = preview.GetComponent<Image>();
-        Image lockOverlay = preview.transform.Find("LockOverlay")?.GetComponent<Image>();
-
-        if (previewImage != null)
-        {
-            previewImage.sprite = sprite;
-
-            if (!isUnlocked)
+            if (isUnlocked)
             {
-                previewImage.color = Color.black; // Черно-белое для заблокированных
-                if (lockOverlay != null) lockOverlay.gameObject.SetActive(true);
+                // Рисунок разблокирован
+                galleryButtons[i].GetComponent<Image>().sprite = drawingSprites[i];
+                galleryButtons[i].GetComponent<Image>().color = Color.white;
+                lockIcons[i].SetActive(false);
+                hasAnyDrawing = true;
             }
             else
             {
-                previewImage.color = Color.white; // Полноцветное для разблокированных
-                if (lockOverlay != null) lockOverlay.gameObject.SetActive(false);
+                // Рисунок заблокирован
+                galleryButtons[i].GetComponent<Image>().sprite = drawingSprites[i];
+                galleryButtons[i].GetComponent<Image>().color = Color.black; // Черно-белый
+                lockIcons[i].SetActive(true);
             }
         }
 
-        // Добавляем обработчик клика
-        Button button = preview.GetComponent<Button>();
-        if (button != null && isUnlocked)
+        // Показываем текст если нет ни одного рисунка
+        if (emptyText != null)
         {
-            button.onClick.AddListener(() => ShowFullImage(sprite));
+            emptyText.gameObject.SetActive(!hasAnyDrawing);
         }
     }
 
-    void ShowFullImage(Sprite sprite)
+    // Просмотр рисунка (просто выводим в консоль)
+    public void ViewDrawing(int drawingIndex)
     {
-        // Реализуй полноэкранный просмотр изображения
-        Debug.Log($"Показываем полноэкранно: {sprite.name}");
+        int currentSlot = PlayerPrefs.GetInt("CurrentSaveSlot", 0);
+        string levelKey = $"Slot_{currentSlot}_Gallery_Coloring_Level_{drawingIndex + 1}";
+
+        if (PlayerPrefs.GetInt(levelKey, 0) == 1)
+        {
+            Debug.Log($"Просматриваем рисунок {drawingIndex + 1}");
+            // Здесь можно добавить полноэкранный просмотр
+        }
+        else
+        {
+            Debug.Log("Этот рисунок еще не разблокирован!");
+        }
     }
+
 }
