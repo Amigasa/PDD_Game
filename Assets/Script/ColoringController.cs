@@ -2,24 +2,26 @@
 using TMPro;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class ColoringController : MonoBehaviour
 {
     [Header("Основные элементы")]
     public TMP_Text questionText;
     public Button[] answerButtons;
-    public Image[] imageParts; // Part1, Part2, Part3, Part4
+    public Image[] imageParts;
     public GameObject victoryPanel;
-    public GameObject defeatPanel; // ДОБАВИЛИ ПАНЕЛЬ ПРОИГРЫША
+    public GameObject defeatPanel;
+    public TMP_Text victoryText;
 
     [Header("Настройки")]
     public int totalQuestions = 4;
-    public int maxErrors = 2; // Максимум ошибок
+    public int maxErrors = 2;
 
     private int currentQuestion = 0;
     private int correctAnswer;
     private bool isGameActive = true;
-    private int errorCount = 0; // Счетчик ошибок
+    private int errorCount = 0;
 
     void Start()
     {
@@ -28,6 +30,8 @@ public class ColoringController : MonoBehaviour
 
     void GenerateQuestion()
     {
+        if (!isGameActive) return;
+
         int number1 = Random.Range(2, 10);
         int number2 = Random.Range(2, 10);
         correctAnswer = number1 * number2;
@@ -68,34 +72,29 @@ public class ColoringController : MonoBehaviour
 
         if (selectedAnswer == correctAnswer)
         {
-            // Правильно - красим в хороший цвет
             ColorImagePart(currentQuestion, true);
             currentQuestion++;
         }
         else
         {
-            // Неправильно - красим в плохой цвет и считаем ошибку
             ColorImagePart(currentQuestion, false);
             errorCount++;
             currentQuestion++;
         }
 
-        // Проверяем условия окончания игры
         if (errorCount >= maxErrors)
         {
-            // Слишком много ошибок - проигрыш
             Defeat();
         }
         else if (currentQuestion >= totalQuestions)
         {
-            // Все вопросы закончились - проверяем победу
             if (errorCount == 0)
             {
-                Victory();
+                Victory(true);
             }
             else
             {
-                Defeat();
+                Victory(false);
             }
         }
         else
@@ -106,95 +105,162 @@ public class ColoringController : MonoBehaviour
 
     void ColorImagePart(int partIndex, bool isCorrect)
     {
-        if (partIndex < imageParts.Length)
+        if (partIndex < imageParts.Length && imageParts[partIndex] != null)
         {
             Color color = isCorrect ? GetGoodColor(partIndex) : GetBadColor();
-            imageParts[partIndex].color = color;
+            StartCoroutine(AnimateColorChange(imageParts[partIndex], color));
         }
+    }
+
+    IEnumerator AnimateColorChange(Image imagePart, Color targetColor)
+    {
+        Color startColor = imagePart.color;
+        float duration = 0.5f;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            imagePart.color = Color.Lerp(startColor, targetColor, elapsed / duration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        imagePart.color = targetColor;
     }
 
     Color GetGoodColor(int partIndex)
     {
-        // Хорошие цвета для каждой части
         Color[] goodColors = {
-            new Color(0.4f, 0.7f, 1f),    // Голубой (небо)
-            new Color(0.3f, 0.8f, 0.3f),  // Зеленый (трава)
-            new Color(1f, 0.8f, 0.3f),    // Желтый (солнце)
-            new Color(0.9f, 0.6f, 0.3f)   // Коричневый (дерево)
+            new Color(0.4f, 0.7f, 1f),
+            new Color(0.3f, 0.8f, 0.3f),
+            new Color(1f, 0.8f, 0.3f),
+            new Color(0.9f, 0.6f, 0.3f)
         };
 
-        return goodColors[partIndex];
+        return partIndex < goodColors.Length ? goodColors[partIndex] : Color.white;
     }
 
     Color GetBadColor()
     {
-        // Случайный плохой цвет (яркий и некрасивый)
         return new Color(
-            Random.Range(0.8f, 1f),   // Яркий красный
-            Random.Range(0f, 0.2f),   // Минимум зеленого
-            Random.Range(0.8f, 1f)    // Яркий синий
+            Random.Range(0.8f, 1f),
+            Random.Range(0f, 0.2f),
+            Random.Range(0.8f, 1f)
         );
     }
 
-    void Victory()
+    void Victory(bool isPerfect)
     {
         isGameActive = false;
-        victoryPanel.SetActive(true);
 
-        // Сохраняем в галерею
-        SaveToGallery();
+        int levelNumber = GetCurrentLevelNumber();
+
+        // Используем SimpleSlotManager для сохранения
+        if (isPerfect)
+        {
+            // Идеальное прохождение - 3 звезды и разблокировка галереи
+            SaveLevelProgress(levelNumber, 3);
+            UnlockGalleryImage(levelNumber);
+            victoryText.text = "Идеально! Рисунок добавлен в галерею! 🎨";
+        }
+        else
+        {
+            // Обычное прохождение - 1 звезда
+            SaveLevelProgress(levelNumber, 1);
+            victoryText.text = $"Хорошо! Но есть {errorCount} ошибок.\nПопробуй без ошибок для галереи!";
+        }
+
+        victoryPanel.SetActive(true);
     }
 
     void Defeat()
     {
         isGameActive = false;
-        defeatPanel.SetActive(true);
 
-        // Обновляем текст в зависимости от количества ошибок
+        int levelNumber = GetCurrentLevelNumber();
+
+        // Сохраняем пройденным но с 0 звезд
+        SaveLevelProgress(levelNumber, 0);
+
         TMP_Text defeatText = defeatPanel.GetComponentInChildren<TMP_Text>();
         if (defeatText != null)
         {
-            if (errorCount >= maxErrors)
-            {
-                defeatText.text = "Слишком много ошибок!\nПопробуй еще раз!";
-            }
-            else
-            {
-                defeatText.text = "Почти получилось!\nПопробуй еще раз!";
-            }
+            defeatText.text = errorCount >= maxErrors ?
+                "Слишком много ошибок!\nПопробуй еще раз!" :
+                "Почти получилось!\nПопробуй еще раз!";
         }
+
+        defeatPanel.SetActive(true);
     }
 
-    void SaveToGallery()
+    int GetCurrentLevelNumber()
+    {
+        string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+
+        if (sceneName.Contains("1")) return 1;
+        if (sceneName.Contains("2")) return 2;
+        if (sceneName.Contains("3")) return 3;
+        if (sceneName.Contains("4")) return 4;
+
+        return 1;
+    }
+
+    void SaveLevelProgress(int levelNumber, int stars)
     {
         int currentSlot = PlayerPrefs.GetInt("CurrentSaveSlot", 0);
 
-        // Определяем номер уровня из имени сцены
-        string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-        int levelNumber = 1; // По умолчанию первый уровень
-
-        if (sceneName.Contains("2")) levelNumber = 2;
-        else if (sceneName.Contains("3")) levelNumber = 3;
-        else if (sceneName.Contains("4")) levelNumber = 4;
-
-        // Сохраняем что уровень пройден идеально
-        string galleryKey = $"Slot_{currentSlot}_Gallery_Coloring_Level_{levelNumber}";
-        PlayerPrefs.SetInt(galleryKey, 1);
+        // Сохраняем прогресс уровня
+        PlayerPrefs.SetInt($"Slot_{currentSlot}_Coloring_Level_{levelNumber}_stars", stars);
+        PlayerPrefs.SetInt($"Slot_{currentSlot}_Coloring_Level_{levelNumber}_completed", 1);
         PlayerPrefs.Save();
 
-        Debug.Log($"Рисунок уровня {levelNumber} добавлен в галерею!");
+        Debug.Log($"Сохранен прогресс: Раскраска Уровень {levelNumber}, Звезд: {stars}");
     }
 
-    // Кнопки
+    void UnlockGalleryImage(int levelNumber)
+    {
+        int currentSlot = PlayerPrefs.GetInt("CurrentSaveSlot", 0);
+
+        // Разблокируем рисунок в галерее
+        PlayerPrefs.SetInt($"Slot_{currentSlot}_Gallery_Level_{levelNumber}", 1);
+        PlayerPrefs.Save();
+
+        Debug.Log($"Рисунок уровня {levelNumber} разблокирован в галерее слота {currentSlot}!");
+    }
+
+    // Кнопки UI
     public void RestartLevel()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(
-            UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex
+        SceneManager.LoadScene(
+            SceneManager.GetActiveScene().buildIndex
         );
     }
 
     public void BackToMenu()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+        SceneManager.LoadScene(2);
+    }
+
+    public void LoadNextLevel()
+    {
+        int currentLevel = GetCurrentLevelNumber();
+        int nextLevel = currentLevel + 1;
+
+        if (nextLevel <= 4)
+        {
+            string nextSceneName = $"ColoringLevel{nextLevel}";
+            if (Application.CanStreamedLevelBeLoaded(nextSceneName))
+            {
+                SceneManager.LoadScene(nextSceneName);
+            }
+            else
+            {
+                BackToMenu();
+            }
+        }
+        else
+        {
+            BackToMenu();
+        }
     }
 }

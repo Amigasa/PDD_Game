@@ -55,7 +55,6 @@ public class LevelSelectionManager : MonoBehaviour
             if (buttonImage != null)
             {
                 if (completed) buttonImage.color = Color.green;
-                else if (unlocked) buttonImage.color = Color.white;
                 else buttonImage.color = Color.gray;
             }
         }

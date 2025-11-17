@@ -659,7 +659,7 @@ MonoBehaviour:
     - {fileID: 401298691}
     levelText: {fileID: 1141323700}
   - levelId: Battle_Level_2
-    sceneBuildIndex: 4
+    sceneBuildIndex: 3
     levelButton: {fileID: 360984471}
     stars:
     - {fileID: 1054593219}
@@ -667,7 +667,7 @@ MonoBehaviour:
     - {fileID: 547508066}
     levelText: {fileID: 711831264}
   - levelId: Battle_Level_3
-    sceneBuildIndex: 5
+    sceneBuildIndex: 3
     levelButton: {fileID: 2045387028}
     stars:
     - {fileID: 1171069301}
@@ -675,7 +675,7 @@ MonoBehaviour:
     - {fileID: 1482588750}
     levelText: {fileID: 1347432545}
   - levelId: Battle_Level_4
-    sceneBuildIndex: 6
+    sceneBuildIndex: 3
     levelButton: {fileID: 407171670}
     stars:
     - {fileID: 1033251095}
@@ -683,7 +683,7 @@ MonoBehaviour:
     - {fileID: 1615199713}
     levelText: {fileID: 1479638183}
   - levelId: Battle_Level_5
-    sceneBuildIndex: 7
+    sceneBuildIndex: 3
     levelButton: {fileID: 638705761}
     stars:
     - {fileID: 394491823}
@@ -691,7 +691,7 @@ MonoBehaviour:
     - {fileID: 1387467160}
     levelText: {fileID: 1874128160}
   - levelId: Battle_Level_6
-    sceneBuildIndex: 8
+    sceneBuildIndex: 3
     levelButton: {fileID: 1551079641}
     stars:
     - {fileID: 121755739}
@@ -699,7 +699,7 @@ MonoBehaviour:
     - {fileID: 1564893023}
     levelText: {fileID: 325957248}
   - levelId: Battle_Level_7
-    sceneBuildIndex: 9
+    sceneBuildIndex: 3
     levelButton: {fileID: 944649309}
     stars:
     - {fileID: 1001331095}
@@ -707,7 +707,7 @@ MonoBehaviour:
     - {fileID: 529620358}
     levelText: {fileID: 618848975}
   - levelId: Battle_Level_8
-    sceneBuildIndex: 10
+    sceneBuildIndex: 3
     levelButton: {fileID: 184067371}
     stars:
     - {fileID: 1491428089}
@@ -1131,7 +1131,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.85255563, y: 0.238}
   m_AnchorMax: {x: 0.85255563, y: 0.238}
-  m_AnchoredPosition: {x: -4, y: -1}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 300.6418, y: 134.9309}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &333698859

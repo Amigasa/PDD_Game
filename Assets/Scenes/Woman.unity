@@ -553,6 +553,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1c66c6b0bad4ba4f91893eac13021c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SavePanel: {fileID: 0}
   MenuPanel: {fileID: 0}
   RejimiPanel: {fileID: 0}
 --- !u!4 &118738521
@@ -565,6 +566,61 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1164.3011, y: 635.4371, z: -7.3320265}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &121225989
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 121225991}
+  - component: {fileID: 121225990}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &121225990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 121225989}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6918cfdb2976024e92da10ab11451e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  levels:
+  - levelId: Coloring_Level_1
+    sceneBuildIndex: 5
+    levelButton: {fileID: 968241010}
+    stars: []
+    levelText: {fileID: 73154332}
+  - levelId: 
+    sceneBuildIndex: 0
+    levelButton: {fileID: 0}
+    stars: []
+    levelText: {fileID: 0}
+--- !u!4 &121225991
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 121225989}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1207.1189, y: 667.6466, z: -8.229803}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1696,10 +1752,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 118738520}
-        m_TargetAssemblyTypeName: KnopkiMenu, Assembly-CSharp
-        m_MethodName: Woman_1_lvl
-        m_Mode: 1
+      - m_Target: {fileID: 121225990}
+        m_TargetAssemblyTypeName: LevelSelectionManager, Assembly-CSharp
+        m_MethodName: LoadLevel
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -1831,7 +1887,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 118738520}
         m_TargetAssemblyTypeName: KnopkiMenu, Assembly-CSharp
-        m_MethodName: ExMenu
+        m_MethodName: BackFromGallery
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2907,3 +2963,4 @@ SceneRoots:
   - {fileID: 283849069}
   - {fileID: 263625244}
   - {fileID: 118738521}
+  - {fileID: 121225991}
