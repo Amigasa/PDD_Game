@@ -1,5 +1,6 @@
-﻿using UnityEngine;
-using TMPro;
+﻿using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class LevelSelectionManager : MonoBehaviour
@@ -80,5 +81,9 @@ public class LevelSelectionManager : MonoBehaviour
         PlayerPrefs.Save();
 
         UnityEngine.SceneManagement.SceneManager.LoadScene(sceneIndex);
+    }
+    public void BackToMenu()
+    {
+        SceneManager.LoadScene(0);
     }
 }
