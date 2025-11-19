@@ -2,17 +2,20 @@
 using TMPro;
 using UnityEngine.UI;
 using System.Collections;
-using UnityEngine.SceneManagement;
 
 public class ColoringController : MonoBehaviour
 {
     [Header("Основные элементы")]
     public TMP_Text questionText;
     public Button[] answerButtons;
-    public Image[] imageParts;
     public GameObject victoryPanel;
     public GameObject defeatPanel;
     public TMP_Text victoryText;
+
+    [Header("Части рисунка")]
+    public GameObject[] correctParts;    // Правильные части (изначально невидимы)
+    public GameObject[] wrongParts;      // Неправильные части (изначально невидимы)
+    public Image baseDrawing;           // Базовый контур (всегда виден)
 
     [Header("Настройки")]
     public int totalQuestions = 4;
@@ -22,10 +25,28 @@ public class ColoringController : MonoBehaviour
     private int correctAnswer;
     private bool isGameActive = true;
     private int errorCount = 0;
+    private int correctAnswers = 0;
 
     void Start()
     {
+        InitializeDrawing();
         GenerateQuestion();
+    }
+
+    void InitializeDrawing()
+    {
+        // Скрываем все части рисунка изначально
+        foreach (GameObject part in correctParts)
+        {
+            if (part != null) part.SetActive(false);
+        }
+        foreach (GameObject part in wrongParts)
+        {
+            if (part != null) part.SetActive(false);
+        }
+
+        // Базовый контур всегда виден
+        if (baseDrawing != null) baseDrawing.gameObject.SetActive(true);
     }
 
     void GenerateQuestion()
@@ -72,15 +93,18 @@ public class ColoringController : MonoBehaviour
 
         if (selectedAnswer == correctAnswer)
         {
-            ColorImagePart(currentQuestion, true);
-            currentQuestion++;
+            // Правильный ответ - показываем правильную часть
+            correctAnswers++;
+            ShowPart(currentQuestion, true);
         }
         else
         {
-            ColorImagePart(currentQuestion, false);
+            // Неправильный ответ - показываем неправильную часть
             errorCount++;
-            currentQuestion++;
+            ShowPart(currentQuestion, false);
         }
+
+        currentQuestion++;
 
         if (errorCount >= maxErrors)
         {
@@ -103,50 +127,61 @@ public class ColoringController : MonoBehaviour
         }
     }
 
-    void ColorImagePart(int partIndex, bool isCorrect)
+    void ShowPart(int partIndex, bool isCorrect)
     {
-        if (partIndex < imageParts.Length && imageParts[partIndex] != null)
+        if (partIndex < correctParts.Length && partIndex < wrongParts.Length)
         {
-            Color color = isCorrect ? GetGoodColor(partIndex) : GetBadColor();
-            StartCoroutine(AnimateColorChange(imageParts[partIndex], color));
+            if (isCorrect)
+            {
+                // Показываем правильную часть
+                if (correctParts[partIndex] != null)
+                {
+                    correctParts[partIndex].SetActive(true);
+                    StartCoroutine(AnimateAppearance(correctParts[partIndex]));
+                }
+                // Гарантируем что неправильная часть скрыта
+                if (wrongParts[partIndex] != null)
+                    wrongParts[partIndex].SetActive(false);
+            }
+            else
+            {
+                // Показываем неправильную часть
+                if (wrongParts[partIndex] != null)
+                {
+                    wrongParts[partIndex].SetActive(true);
+                    StartCoroutine(AnimateAppearance(wrongParts[partIndex]));
+                }
+                // Гарантируем что правильная часть скрыта
+                if (correctParts[partIndex] != null)
+                    correctParts[partIndex].SetActive(false);
+            }
         }
     }
 
-    IEnumerator AnimateColorChange(Image imagePart, Color targetColor)
+    IEnumerator AnimateAppearance(GameObject part)
     {
-        Color startColor = imagePart.color;
-        float duration = 0.5f;
-        float elapsed = 0f;
+        if (part == null) yield break;
 
-        while (elapsed < duration)
+        Image partImage = part.GetComponent<Image>();
+        if (partImage != null)
         {
-            imagePart.color = Color.Lerp(startColor, targetColor, elapsed / duration);
-            elapsed += Time.deltaTime;
-            yield return null;
+            // Анимация появления (fade in)
+            float duration = 0.5f;
+            float elapsed = 0f;
+            Color originalColor = partImage.color;
+            Color transparentColor = new Color(originalColor.r, originalColor.g, originalColor.b, 0f);
+
+            partImage.color = transparentColor;
+
+            while (elapsed < duration)
+            {
+                partImage.color = Color.Lerp(transparentColor, originalColor, elapsed / duration);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            partImage.color = originalColor;
         }
-
-        imagePart.color = targetColor;
-    }
-
-    Color GetGoodColor(int partIndex)
-    {
-        Color[] goodColors = {
-            new Color(0.4f, 0.7f, 1f),
-            new Color(0.3f, 0.8f, 0.3f),
-            new Color(1f, 0.8f, 0.3f),
-            new Color(0.9f, 0.6f, 0.3f)
-        };
-
-        return partIndex < goodColors.Length ? goodColors[partIndex] : Color.white;
-    }
-
-    Color GetBadColor()
-    {
-        return new Color(
-            Random.Range(0.8f, 1f),
-            Random.Range(0f, 0.2f),
-            Random.Range(0.8f, 1f)
-        );
     }
 
     void Victory(bool isPerfect)
@@ -155,19 +190,18 @@ public class ColoringController : MonoBehaviour
 
         int levelNumber = GetCurrentLevelNumber();
 
-        // Используем SimpleSlotManager для сохранения
+        // Сохраняем прогресс
+        SaveLevelProgress(levelNumber, isPerfect);
+
         if (isPerfect)
         {
-            // Идеальное прохождение - 3 звезды и разблокировка галереи
-            SaveLevelProgress(levelNumber, 3);
+            // Идеальное прохождение - разблокируем рисунок в галерее
             UnlockGalleryImage(levelNumber);
             victoryText.text = "Идеально! Рисунок добавлен в галерею! 🎨";
         }
         else
         {
-            // Обычное прохождение - 1 звезда
-            SaveLevelProgress(levelNumber, 1);
-            victoryText.text = $"Хорошо! Но есть {errorCount} ошибок.\nПопробуй без ошибок для галереи!";
+            victoryText.text = $"Хорошо! Правильных ответов: {correctAnswers}/{totalQuestions}";
         }
 
         victoryPanel.SetActive(true);
@@ -179,15 +213,15 @@ public class ColoringController : MonoBehaviour
 
         int levelNumber = GetCurrentLevelNumber();
 
-        // Сохраняем пройденным но с 0 звезд
-        SaveLevelProgress(levelNumber, 0);
+        // Сохраняем обычный прогресс (без галереи)
+        SaveLevelProgress(levelNumber, false);
 
         TMP_Text defeatText = defeatPanel.GetComponentInChildren<TMP_Text>();
         if (defeatText != null)
         {
             defeatText.text = errorCount >= maxErrors ?
                 "Слишком много ошибок!\nПопробуй еще раз!" :
-                "Почти получилось!\nПопробуй еще раз!";
+                $"Почти получилось!\nПравильных ответов: {correctAnswers}/{totalQuestions}";
         }
 
         defeatPanel.SetActive(true);
@@ -205,24 +239,36 @@ public class ColoringController : MonoBehaviour
         return 1;
     }
 
-    void SaveLevelProgress(int levelNumber, int stars)
+    void SaveLevelProgress(int levelNumber, bool isPerfect)
     {
         int currentSlot = PlayerPrefs.GetInt("CurrentSaveSlot", 0);
 
-        // Сохраняем прогресс уровня
-        PlayerPrefs.SetInt($"Slot_{currentSlot}_Coloring_Level_{levelNumber}_stars", stars);
-        PlayerPrefs.SetInt($"Slot_{currentSlot}_Coloring_Level_{levelNumber}_completed", 1);
+        // Сохраняем что уровень пройден
+        string completedKey = $"Slot_{currentSlot}_Coloring_Level_{levelNumber}_completed";
+        PlayerPrefs.SetInt(completedKey, 1);
+
+        // Сохраняем количество звезд (3 звезды за идеальное прохождение, 1 за обычное)
+        int stars = isPerfect ? 3 : (correctAnswers >= totalQuestions * 0.7f ? 2 : 1);
+        string starsKey = $"Slot_{currentSlot}_Coloring_Level_{levelNumber}_stars";
+        PlayerPrefs.SetInt(starsKey, stars);
+
+        // Сохраняем идеальное прохождение для галереи
+        if (isPerfect)
+        {
+            string perfectKey = $"Slot_{currentSlot}_Coloring_Level_{levelNumber}_perfect";
+            PlayerPrefs.SetInt(perfectKey, 1);
+        }
+
         PlayerPrefs.Save();
 
-        Debug.Log($"Сохранен прогресс: Раскраска Уровень {levelNumber}, Звезд: {stars}");
+        Debug.Log($"Сохранен прогресс: Уровень {levelNumber}, Звезд: {stars}, Идеально: {isPerfect}");
     }
 
     void UnlockGalleryImage(int levelNumber)
     {
         int currentSlot = PlayerPrefs.GetInt("CurrentSaveSlot", 0);
-
-        // Разблокируем рисунок в галерее
-        PlayerPrefs.SetInt($"Slot_{currentSlot}_Gallery_Level_{levelNumber}", 1);
+        string galleryKey = $"Slot_{currentSlot}_Gallery_Level_{levelNumber}";
+        PlayerPrefs.SetInt(galleryKey, 1);
         PlayerPrefs.Save();
 
         Debug.Log($"Рисунок уровня {levelNumber} разблокирован в галерее слота {currentSlot}!");
@@ -231,14 +277,14 @@ public class ColoringController : MonoBehaviour
     // Кнопки UI
     public void RestartLevel()
     {
-        SceneManager.LoadScene(
-            SceneManager.GetActiveScene().buildIndex
+        UnityEngine.SceneManagement.SceneManager.LoadScene(
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex
         );
     }
 
     public void BackToMenu()
     {
-        SceneManager.LoadScene(2);
+        UnityEngine.SceneManagement.SceneManager.LoadScene(2);
     }
 
     public void LoadNextLevel()
@@ -251,7 +297,7 @@ public class ColoringController : MonoBehaviour
             string nextSceneName = $"ColoringLevel{nextLevel}";
             if (Application.CanStreamedLevelBeLoaded(nextSceneName))
             {
-                SceneManager.LoadScene(nextSceneName);
+                UnityEngine.SceneManagement.SceneManager.LoadScene(nextSceneName);
             }
             else
             {

@@ -13,8 +13,8 @@ public class LevelProgress
 public class BattleLevelController : MonoBehaviour
 {
     [Header("Player & Enemy")]
-    public GameObject player;
-    public GameObject enemy;
+    public Image playerImage;
+    public Image enemyImage;
     public int playerHealth = 3;
     public int enemyHealth = 3;
 
@@ -135,24 +135,36 @@ public class BattleLevelController : MonoBehaviour
 
     IEnumerator AttackEnemy()
     {
-        Vector3 originalPos = player.transform.position;
-        player.transform.position = originalPos + new Vector3(0.5f, 0, 0);
+        // Анимация атаки игрока для UI Image
+        Vector2 originalPos = playerImage.rectTransform.anchoredPosition;
+        playerImage.rectTransform.anchoredPosition = originalPos + new Vector2(50f, 0);
+
         yield return new WaitForSeconds(0.3f);
-        enemy.GetComponent<SpriteRenderer>().color = Color.red;
+
+        // Анимация получения урона монстром - меняем цвет
+        enemyImage.color = Color.red;
+
         yield return new WaitForSeconds(0.2f);
-        player.transform.position = originalPos;
-        enemy.GetComponent<SpriteRenderer>().color = Color.white;
+
+        playerImage.rectTransform.anchoredPosition = originalPos;
+        enemyImage.color = Color.white;
     }
 
     IEnumerator AttackPlayer()
     {
-        Vector3 originalPos = enemy.transform.position;
-        enemy.transform.position = originalPos + new Vector3(-0.5f, 0, 0);
+        // Анимация атаки монстра для UI Image
+        Vector2 originalPos = enemyImage.rectTransform.anchoredPosition;
+        enemyImage.rectTransform.anchoredPosition = originalPos + new Vector2(-50f, 0);
+
         yield return new WaitForSeconds(0.3f);
-        player.GetComponent<SpriteRenderer>().color = Color.red;
+
+        // Анимация получения урона игроком - меняем цвет
+        playerImage.color = Color.red;
+
         yield return new WaitForSeconds(0.2f);
-        enemy.transform.position = originalPos;
-        player.GetComponent<SpriteRenderer>().color = Color.white;
+
+        enemyImage.rectTransform.anchoredPosition = originalPos;
+        playerImage.color = Color.white;
     }
 
     void UpdateHearts()

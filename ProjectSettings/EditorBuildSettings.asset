@@ -23,4 +23,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Coloring_Level_1.unity
     guid: 32da1af5146f45a4396fa10d4abd9be2
+  - enabled: 1
+    path: Assets/Scenes/BattleLevel12.unity
+    guid: 1a3f18fd00141f64bac2bbfb22cfe8e4
   m_configObjects: {}

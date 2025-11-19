@@ -659,7 +659,7 @@ MonoBehaviour:
     - {fileID: 401298691}
     levelText: {fileID: 1141323700}
   - levelId: Battle_Level_2
-    sceneBuildIndex: 3
+    sceneBuildIndex: 6
     levelButton: {fileID: 360984471}
     stars:
     - {fileID: 1054593219}
