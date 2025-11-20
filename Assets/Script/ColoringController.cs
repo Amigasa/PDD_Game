@@ -2,6 +2,7 @@
 using TMPro;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class ColoringController : MonoBehaviour
 {
@@ -13,13 +14,14 @@ public class ColoringController : MonoBehaviour
     public TMP_Text victoryText;
 
     [Header("Части рисунка")]
-    public GameObject[] correctParts;    // Правильные части (изначально невидимы)
-    public GameObject[] wrongParts;      // Неправильные части (изначально невидимы)
-    public Image baseDrawing;           // Базовый контур (всегда виден)
+    public GameObject[] correctParts;
+    public GameObject[] wrongParts;
+    public Image baseDrawing;
 
     [Header("Настройки")]
     public int totalQuestions = 4;
     public int maxErrors = 2;
+    public string levelId = "Coloring_Level_1"; // levelId задается в Inspector
 
     private int currentQuestion = 0;
     private int correctAnswer;
@@ -29,13 +31,20 @@ public class ColoringController : MonoBehaviour
 
     void Start()
     {
+        // Используем levelId из Inspector, как в BattleLevelController
+        if (string.IsNullOrEmpty(levelId))
+        {
+            levelId = "Coloring_Level_1"; // fallback
+        }
+
         InitializeDrawing();
         GenerateQuestion();
+
+        Debug.Log($"Загружен уровень раскраски: {levelId}");
     }
 
     void InitializeDrawing()
     {
-        // Скрываем все части рисунка изначально
         foreach (GameObject part in correctParts)
         {
             if (part != null) part.SetActive(false);
@@ -45,7 +54,6 @@ public class ColoringController : MonoBehaviour
             if (part != null) part.SetActive(false);
         }
 
-        // Базовый контур всегда виден
         if (baseDrawing != null) baseDrawing.gameObject.SetActive(true);
     }
 
@@ -93,13 +101,11 @@ public class ColoringController : MonoBehaviour
 
         if (selectedAnswer == correctAnswer)
         {
-            // Правильный ответ - показываем правильную часть
             correctAnswers++;
             ShowPart(currentQuestion, true);
         }
         else
         {
-            // Неправильный ответ - показываем неправильную часть
             errorCount++;
             ShowPart(currentQuestion, false);
         }
@@ -133,25 +139,21 @@ public class ColoringController : MonoBehaviour
         {
             if (isCorrect)
             {
-                // Показываем правильную часть
                 if (correctParts[partIndex] != null)
                 {
                     correctParts[partIndex].SetActive(true);
                     StartCoroutine(AnimateAppearance(correctParts[partIndex]));
                 }
-                // Гарантируем что неправильная часть скрыта
                 if (wrongParts[partIndex] != null)
                     wrongParts[partIndex].SetActive(false);
             }
             else
             {
-                // Показываем неправильную часть
                 if (wrongParts[partIndex] != null)
                 {
                     wrongParts[partIndex].SetActive(true);
                     StartCoroutine(AnimateAppearance(wrongParts[partIndex]));
                 }
-                // Гарантируем что правильная часть скрыта
                 if (correctParts[partIndex] != null)
                     correctParts[partIndex].SetActive(false);
             }
@@ -165,7 +167,6 @@ public class ColoringController : MonoBehaviour
         Image partImage = part.GetComponent<Image>();
         if (partImage != null)
         {
-            // Анимация появления (fade in)
             float duration = 0.5f;
             float elapsed = 0f;
             Color originalColor = partImage.color;
@@ -188,15 +189,12 @@ public class ColoringController : MonoBehaviour
     {
         isGameActive = false;
 
-        int levelNumber = GetCurrentLevelNumber();
-
-        // Сохраняем прогресс
-        SaveLevelProgress(levelNumber, isPerfect);
+        // Сохраняем прогресс с levelId из Inspector
+        SaveLevelProgress(isPerfect);
 
         if (isPerfect)
         {
-            // Идеальное прохождение - разблокируем рисунок в галерее
-            UnlockGalleryImage(levelNumber);
+            UnlockGalleryImage();
             victoryText.text = "Идеально! Рисунок добавлен в галерею! 🎨";
         }
         else
@@ -211,10 +209,8 @@ public class ColoringController : MonoBehaviour
     {
         isGameActive = false;
 
-        int levelNumber = GetCurrentLevelNumber();
-
-        // Сохраняем обычный прогресс (без галереи)
-        SaveLevelProgress(levelNumber, false);
+        // Сохраняем обычный прогресс
+        SaveLevelProgress(false);
 
         TMP_Text defeatText = defeatPanel.GetComponentInChildren<TMP_Text>();
         if (defeatText != null)
@@ -227,46 +223,35 @@ public class ColoringController : MonoBehaviour
         defeatPanel.SetActive(true);
     }
 
-    int GetCurrentLevelNumber()
-    {
-        string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-
-        if (sceneName.Contains("1")) return 1;
-        if (sceneName.Contains("2")) return 2;
-        if (sceneName.Contains("3")) return 3;
-        if (sceneName.Contains("4")) return 4;
-
-        return 1;
-    }
-
-    void SaveLevelProgress(int levelNumber, bool isPerfect)
+    // ОБНОВЛЕННЫЙ МЕТОД - использует levelId из Inspector
+    void SaveLevelProgress(bool isPerfect)
     {
         int currentSlot = PlayerPrefs.GetInt("CurrentSaveSlot", 0);
 
         // Сохраняем что уровень пройден
-        string completedKey = $"Slot_{currentSlot}_Coloring_Level_{levelNumber}_completed";
+        string completedKey = $"Slot_{currentSlot}_{levelId}_completed";
         PlayerPrefs.SetInt(completedKey, 1);
 
-        // Сохраняем количество звезд (3 звезды за идеальное прохождение, 1 за обычное)
+        // Сохраняем количество звезд
         int stars = isPerfect ? 3 : (correctAnswers >= totalQuestions * 0.7f ? 2 : 1);
-        string starsKey = $"Slot_{currentSlot}_Coloring_Level_{levelNumber}_stars";
+        string starsKey = $"Slot_{currentSlot}_{levelId}_stars";
         PlayerPrefs.SetInt(starsKey, stars);
-
-        // Сохраняем идеальное прохождение для галереи
-        if (isPerfect)
-        {
-            string perfectKey = $"Slot_{currentSlot}_Coloring_Level_{levelNumber}_perfect";
-            PlayerPrefs.SetInt(perfectKey, 1);
-        }
 
         PlayerPrefs.Save();
 
-        Debug.Log($"Сохранен прогресс: Уровень {levelNumber}, Звезд: {stars}, Идеально: {isPerfect}");
+        Debug.Log($"Сохранен прогресс: {levelId}, Звезд: {stars}, Идеально: {isPerfect}");
     }
 
-    void UnlockGalleryImage(int levelNumber)
+    void UnlockGalleryImage()
     {
         int currentSlot = PlayerPrefs.GetInt("CurrentSaveSlot", 0);
+
+        // Определяем номер уровня из levelId (например "Coloring_Level_1" -> 1)
+        int levelNumber = 1;
+        if (levelId.Contains("2")) levelNumber = 2;
+        else if (levelId.Contains("3")) levelNumber = 3;
+        else if (levelId.Contains("4")) levelNumber = 4;
+
         string galleryKey = $"Slot_{currentSlot}_Gallery_Level_{levelNumber}";
         PlayerPrefs.SetInt(galleryKey, 1);
         PlayerPrefs.Save();
@@ -277,19 +262,22 @@ public class ColoringController : MonoBehaviour
     // Кнопки UI
     public void RestartLevel()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(
-            UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex
-        );
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void BackToMenu()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(2);
+        SceneManager.LoadScene(2);
     }
 
     public void LoadNextLevel()
     {
-        int currentLevel = GetCurrentLevelNumber();
+        // Определяем следующий уровень из levelId
+        int currentLevel = 1;
+        if (levelId.Contains("2")) currentLevel = 2;
+        else if (levelId.Contains("3")) currentLevel = 3;
+        else if (levelId.Contains("4")) currentLevel = 4;
+
         int nextLevel = currentLevel + 1;
 
         if (nextLevel <= 4)
@@ -297,7 +285,7 @@ public class ColoringController : MonoBehaviour
             string nextSceneName = $"ColoringLevel{nextLevel}";
             if (Application.CanStreamedLevelBeLoaded(nextSceneName))
             {
-                UnityEngine.SceneManagement.SceneManager.LoadScene(nextSceneName);
+                SceneManager.LoadScene(nextSceneName);
             }
             else
             {

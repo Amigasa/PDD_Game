@@ -15,15 +15,54 @@ EditorBuildSettings:
     path: Assets/Scenes/Woman.unity
     guid: 9e45cec2815817d47ae1ee79247fa249
   - enabled: 1
-    path: Assets/Scenes/BattleLevel1.unity
+    path: Assets/Scenes/Battle/BattleLevel1.unity
     guid: 5b360ff298268dd489ae66348e447533
   - enabled: 1
     path: Assets/Scenes/Gallery.unity
     guid: e92029e5c9b330346b109c371e1600ee
   - enabled: 1
-    path: Assets/Scenes/Coloring_Level_1.unity
+    path: Assets/Scenes/Color/Coloring_Level_1.unity
     guid: 32da1af5146f45a4396fa10d4abd9be2
   - enabled: 1
-    path: Assets/Scenes/BattleLevel12.unity
+    path: Assets/Scenes/Battle/BattleLevel2.unity
     guid: 1a3f18fd00141f64bac2bbfb22cfe8e4
+  - enabled: 1
+    path: Assets/Scenes/Battle/BattleLevel3.unity
+    guid: c5a826b1a8feb1f409495d86aca3593e
+  - enabled: 1
+    path: Assets/Scenes/Battle/BattleLevel4.unity
+    guid: a55a7cbf13e8b6f468246ff2e6f9811a
+  - enabled: 1
+    path: Assets/Scenes/Battle/BattleLevel5.unity
+    guid: fe68331a03828124082a29f13c4773bd
+  - enabled: 1
+    path: Assets/Scenes/Battle/BattleLevel6.unity
+    guid: d48c4148315af614db9f441e7985f5f2
+  - enabled: 1
+    path: Assets/Scenes/Battle/BattleLevel7.unity
+    guid: 44d87bb488c8f8147b5db51bb10bf230
+  - enabled: 1
+    path: Assets/Scenes/Battle/BattleLevel8.unity
+    guid: 3094f27a6ed95bf4887cba770bafb00d
+  - enabled: 1
+    path: Assets/Scenes/Color/Coloring_Level_2.unity
+    guid: a80bc0db93a74e04abef200929867727
+  - enabled: 1
+    path: Assets/Scenes/Color/Coloring_Level_3.unity
+    guid: 8cc5ff5b9f0caa44aa2ed67c343c2c3f
+  - enabled: 1
+    path: Assets/Scenes/Color/Coloring_Level_4.unity
+    guid: 94a8f91efdc585f4ea8af48585fbdad1
+  - enabled: 1
+    path: Assets/Scenes/Color/Coloring_Level_5.unity
+    guid: 6e177f5943697244eb1825ada3561ce9
+  - enabled: 1
+    path: Assets/Scenes/Color/Coloring_Level_6.unity
+    guid: 2f0935b0ba013ef48a57509ff299a6dc
+  - enabled: 1
+    path: Assets/Scenes/Color/Coloring_Level_7.unity
+    guid: ae9b891bddb2b214eafd3219e032bfaf
+  - enabled: 1
+    path: Assets/Scenes/Color/Coloring_Level_8.unity
+    guid: 257fa5608fe393146af5d7dc4503eee3
   m_configObjects: {}
