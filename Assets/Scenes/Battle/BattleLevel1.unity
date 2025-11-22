@@ -450,54 +450,54 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   difficultyLevels:
-  - minNumber: 2
+  - minNumber: 1
     maxNumber: 5
     wrongAnswerRange: 2
     totalQuestions: 5
     useTrickyAnswers: 0
-    timeBonusThreshold: 5
+    timeBonusThreshold: 15
   - minNumber: 2
     maxNumber: 6
     wrongAnswerRange: 3
     totalQuestions: 6
     useTrickyAnswers: 0
-    timeBonusThreshold: 4.5
+    timeBonusThreshold: 13
   - minNumber: 3
     maxNumber: 7
     wrongAnswerRange: 3
     totalQuestions: 6
     useTrickyAnswers: 1
-    timeBonusThreshold: 4
+    timeBonusThreshold: 11.5
   - minNumber: 4
     maxNumber: 8
     wrongAnswerRange: 4
     totalQuestions: 7
     useTrickyAnswers: 1
-    timeBonusThreshold: 3.5
+    timeBonusThreshold: 10
   - minNumber: 5
     maxNumber: 9
     wrongAnswerRange: 4
     totalQuestions: 7
     useTrickyAnswers: 1
-    timeBonusThreshold: 3
+    timeBonusThreshold: 8.5
   - minNumber: 6
     maxNumber: 9
     wrongAnswerRange: 5
     totalQuestions: 8
     useTrickyAnswers: 1
-    timeBonusThreshold: 2.5
+    timeBonusThreshold: 8
   - minNumber: 7
     maxNumber: 10
     wrongAnswerRange: 5
     totalQuestions: 8
     useTrickyAnswers: 1
-    timeBonusThreshold: 2
-  - minNumber: 8
-    maxNumber: 10
+    timeBonusThreshold: 7
+  - minNumber: 1
+    maxNumber: 9
     wrongAnswerRange: 6
     totalQuestions: 10
     useTrickyAnswers: 1
-    timeBonusThreshold: 1.5
+    timeBonusThreshold: 5
 --- !u!1 &235659811
 GameObject:
   m_ObjectHideFlags: 0
@@ -3383,7 +3383,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 10
+  m_text: 20
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0415772fefd1d91409e35225f35b7eca, type: 2}
   m_sharedMaterial: {fileID: 7615368655677610605, guid: 0415772fefd1d91409e35225f35b7eca, type: 2}

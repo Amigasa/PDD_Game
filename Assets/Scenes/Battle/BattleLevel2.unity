@@ -1981,7 +1981,7 @@ MonoBehaviour:
     wrongAnswerRange: 3
     totalQuestions: 6
     useTrickyAnswers: 0
-    timeBonusThreshold: 4.5
+    timeBonusThreshold: 13
   - minNumber: 3
     maxNumber: 7
     wrongAnswerRange: 3

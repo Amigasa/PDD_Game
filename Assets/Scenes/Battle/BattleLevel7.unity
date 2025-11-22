@@ -2562,7 +2562,7 @@ MonoBehaviour:
     wrongAnswerRange: 5
     totalQuestions: 8
     useTrickyAnswers: 1
-    timeBonusThreshold: 2
+    timeBonusThreshold: 6.5
   - minNumber: 8
     maxNumber: 10
     wrongAnswerRange: 6

@@ -2826,12 +2826,12 @@ MonoBehaviour:
     totalQuestions: 8
     useTrickyAnswers: 1
     timeBonusThreshold: 2
-  - minNumber: 8
-    maxNumber: 10
+  - minNumber: 1
+    maxNumber: 9
     wrongAnswerRange: 6
     totalQuestions: 10
     useTrickyAnswers: 1
-    timeBonusThreshold: 1.5
+    timeBonusThreshold: 5
 --- !u!4 &1037635104
 Transform:
   m_ObjectHideFlags: 0

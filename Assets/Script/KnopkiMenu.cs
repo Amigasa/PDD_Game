@@ -16,6 +16,10 @@ public class KnopkiMenu : MonoBehaviour
     {
         SceneManager.LoadScene(4);
     }
+    public void StartTutorial()
+    {
+        SceneManager.LoadScene(20);
+    }
 
     public void BackFromGallery()
     {

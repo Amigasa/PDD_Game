@@ -4309,7 +4309,7 @@ MonoBehaviour:
     wrongAnswerRange: 4
     totalQuestions: 7
     useTrickyAnswers: 1
-    timeBonusThreshold: 3.5
+    timeBonusThreshold: 10
   - minNumber: 5
     maxNumber: 9
     wrongAnswerRange: 4

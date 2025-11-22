@@ -3758,7 +3758,7 @@ MonoBehaviour:
     wrongAnswerRange: 3
     totalQuestions: 6
     useTrickyAnswers: 1
-    timeBonusThreshold: 4
+    timeBonusThreshold: 11.5
   - minNumber: 4
     maxNumber: 8
     wrongAnswerRange: 4

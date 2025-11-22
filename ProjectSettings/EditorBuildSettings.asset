@@ -65,4 +65,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Color/Coloring_Level_8.unity
     guid: 257fa5608fe393146af5d7dc4503eee3
+  - enabled: 1
+    path: Assets/Scenes/TutorialScene.unity
+    guid: eacccca1cb284b546885f5211755559a
   m_configObjects: {}
