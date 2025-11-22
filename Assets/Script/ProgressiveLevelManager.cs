@@ -23,7 +23,7 @@ public class ProgressiveLevelManager : MonoBehaviour
             wrongAnswerRange = 2,
             totalQuestions = 5,
             useTrickyAnswers = false,
-            timeBonusThreshold = 5f
+            timeBonusThreshold = 15f
         },
         
         // Уровень 2: Основы
@@ -33,7 +33,7 @@ public class ProgressiveLevelManager : MonoBehaviour
             wrongAnswerRange = 3,
             totalQuestions = 6,
             useTrickyAnswers = false,
-            timeBonusThreshold = 4.5f
+            timeBonusThreshold = 13f
         },
         
         // Уровень 3: Развитие
@@ -43,7 +43,7 @@ public class ProgressiveLevelManager : MonoBehaviour
             wrongAnswerRange = 3,
             totalQuestions = 6,
             useTrickyAnswers = true,
-            timeBonusThreshold = 4f
+            timeBonusThreshold = 11.5f
         },
         
         // Уровень 4: Уверенность
@@ -53,7 +53,7 @@ public class ProgressiveLevelManager : MonoBehaviour
             wrongAnswerRange = 4,
             totalQuestions = 7,
             useTrickyAnswers = true,
-            timeBonusThreshold = 3.5f
+            timeBonusThreshold = 10f
         },
         
         // Уровень 5: Сложность
@@ -63,7 +63,7 @@ public class ProgressiveLevelManager : MonoBehaviour
             wrongAnswerRange = 4,
             totalQuestions = 7,
             useTrickyAnswers = true,
-            timeBonusThreshold = 3f
+            timeBonusThreshold = 8.5f
         },
         
         // Уровень 6: Мастерство
@@ -73,30 +73,31 @@ public class ProgressiveLevelManager : MonoBehaviour
             wrongAnswerRange = 5,
             totalQuestions = 8,
             useTrickyAnswers = true,
-            timeBonusThreshold = 2.5f
+            timeBonusThreshold = 7.5f
         },
         
         // Уровень 7: Эксперт
         new DifficultySettings {
             minNumber = 7,
-            maxNumber = 10,
+            maxNumber = 9,
             wrongAnswerRange = 5,
             totalQuestions = 8,
             useTrickyAnswers = true,
-            timeBonusThreshold = 2f
+            timeBonusThreshold = 6.5f
         },
         
         // Уровень 8: Грандмастер
         new DifficultySettings {
-            minNumber = 8,
-            maxNumber = 10,
+            minNumber = 1,
+            maxNumber = 9,
             wrongAnswerRange = 6,
             totalQuestions = 10,
             useTrickyAnswers = true,
-            timeBonusThreshold = 1.5f
+            timeBonusThreshold = 5f
         }
     };
 
+    // Публичный метод для получения настроек сложности
     public DifficultySettings GetDifficultyForLevel(string levelId)
     {
         int levelNumber = ExtractLevelNumber(levelId);
@@ -104,8 +105,13 @@ public class ProgressiveLevelManager : MonoBehaviour
         return difficultyLevels[difficultyIndex];
     }
 
-    int ExtractLevelNumber(string levelId)
+    // Публичный метод для извлечения номера уровня
+    public int ExtractLevelNumber(string levelId)
     {
+        if (string.IsNullOrEmpty(levelId))
+            return 1;
+
+        // Ищем цифры в строке levelId
         foreach (char c in levelId)
         {
             if (char.IsDigit(c))
@@ -114,5 +120,21 @@ public class ProgressiveLevelManager : MonoBehaviour
             }
         }
         return 1;
+    }
+
+    // Дополнительный метод для получения количества уровней
+    public int GetTotalLevels()
+    {
+        return difficultyLevels.Length;
+    }
+
+    // Метод для получения настроек по индексу уровня
+    public DifficultySettings GetDifficultyByIndex(int levelIndex)
+    {
+        if (levelIndex >= 0 && levelIndex < difficultyLevels.Length)
+        {
+            return difficultyLevels[levelIndex];
+        }
+        return difficultyLevels[0]; // fallback
     }
 }

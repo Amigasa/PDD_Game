@@ -4042,7 +4042,7 @@ MonoBehaviour:
     wrongAnswerRange: 5
     totalQuestions: 8
     useTrickyAnswers: 1
-    timeBonusThreshold: 2.5
+    timeBonusThreshold: 7.5
   - minNumber: 7
     maxNumber: 10
     wrongAnswerRange: 5

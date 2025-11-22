@@ -2558,7 +2558,7 @@ MonoBehaviour:
     useTrickyAnswers: 1
     timeBonusThreshold: 2.5
   - minNumber: 7
-    maxNumber: 10
+    maxNumber: 9
     wrongAnswerRange: 5
     totalQuestions: 8
     useTrickyAnswers: 1
