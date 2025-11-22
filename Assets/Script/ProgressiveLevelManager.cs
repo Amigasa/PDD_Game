@@ -18,7 +18,7 @@ public class ProgressiveLevelManager : MonoBehaviour
     {
         // Уровень 1: Знакомство
         new DifficultySettings {
-            minNumber = 2,
+            minNumber = 1,
             maxNumber = 5,
             wrongAnswerRange = 2,
             totalQuestions = 5,

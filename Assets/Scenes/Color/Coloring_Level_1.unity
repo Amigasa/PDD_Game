@@ -3445,10 +3445,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   difficultyLevels:
-  - minNumber: 2
+  - minNumber: 1
     maxNumber: 5
     wrongAnswerRange: 2
-    totalQuestions: 5
+    totalQuestions: 4
     useTrickyAnswers: 0
     timeBonusThreshold: 15
   - minNumber: 2

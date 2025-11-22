@@ -846,6 +846,99 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 276489288}
   m_CullTransparentMesh: 1
+--- !u!1 &307752362
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 307752364}
+  - component: {fileID: 307752363}
+  m_Layer: 0
+  m_Name: DifficultyManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &307752363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 307752362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3285d678e3152494bafe9a93dabf16c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  difficultyLevels:
+  - minNumber: 2
+    maxNumber: 5
+    wrongAnswerRange: 2
+    totalQuestions: 5
+    useTrickyAnswers: 0
+    timeBonusThreshold: 15
+  - minNumber: 2
+    maxNumber: 6
+    wrongAnswerRange: 3
+    totalQuestions: 6
+    useTrickyAnswers: 0
+    timeBonusThreshold: 13
+  - minNumber: 3
+    maxNumber: 7
+    wrongAnswerRange: 3
+    totalQuestions: 6
+    useTrickyAnswers: 1
+    timeBonusThreshold: 11.5
+  - minNumber: 4
+    maxNumber: 8
+    wrongAnswerRange: 4
+    totalQuestions: 7
+    useTrickyAnswers: 1
+    timeBonusThreshold: 10
+  - minNumber: 5
+    maxNumber: 9
+    wrongAnswerRange: 4
+    totalQuestions: 7
+    useTrickyAnswers: 1
+    timeBonusThreshold: 8.5
+  - minNumber: 6
+    maxNumber: 9
+    wrongAnswerRange: 5
+    totalQuestions: 8
+    useTrickyAnswers: 1
+    timeBonusThreshold: 7.5
+  - minNumber: 7
+    maxNumber: 9
+    wrongAnswerRange: 5
+    totalQuestions: 8
+    useTrickyAnswers: 1
+    timeBonusThreshold: 6.5
+  - minNumber: 1
+    maxNumber: 9
+    wrongAnswerRange: 6
+    totalQuestions: 10
+    useTrickyAnswers: 1
+    timeBonusThreshold: 5
+--- !u!4 &307752364
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 307752362}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1423.9652, y: 590.6244, z: 2.9936147}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &432945503
 GameObject:
   m_ObjectHideFlags: 0
@@ -3022,6 +3115,8 @@ MonoBehaviour:
   victoryPanel: {fileID: 851190967}
   defeatPanel: {fileID: 1908408372}
   victoryText: {fileID: 869976175}
+  difficultyText: {fileID: 0}
+  levelProgressText: {fileID: 0}
   correctParts:
   - {fileID: 190836953}
   - {fileID: 2142294064}
@@ -3033,9 +3128,9 @@ MonoBehaviour:
   - {fileID: 276489288}
   - {fileID: 622794832}
   baseDrawing: {fileID: 1994562567}
-  totalQuestions: 4
   maxErrors: 2
   levelId: Coloring_Level_8
+  progressiveLevelManager: {fileID: 307752363}
 --- !u!4 &1511733339
 Transform:
   m_ObjectHideFlags: 0
@@ -4493,3 +4588,4 @@ SceneRoots:
   - {fileID: 1071827037}
   - {fileID: 2052441037}
   - {fileID: 1511733339}
+  - {fileID: 307752364}
