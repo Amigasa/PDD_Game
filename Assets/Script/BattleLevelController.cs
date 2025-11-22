@@ -2,6 +2,7 @@
 using TMPro;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 [System.Serializable]
 public class LevelProgress
@@ -30,55 +31,197 @@ public class BattleLevelController : MonoBehaviour
     public GameObject[] victoryStars;
     public TMP_Text victoryText;
 
+    [Header("Timer UI - Slider")]
+    public TMP_Text timerText;
+    public Slider timerSlider;
+    public Image timerFillImage;
+
+    [Header("Bonus Effects")]
+    public TMP_Text bonusText;
+
     [Header("Game Settings")]
-    public int totalQuestions = 5;
     public string levelId = "Battle_Level_1";
+
+    [Header("Progressive Difficulty")]
+    public ProgressiveLevelManager difficultyManager;
 
     private int currentQuestion = 0;
     private int correctAnswer;
     private bool isGameActive = true;
     private int starsEarned = 0;
+    private SmartQuestionGenerator questionGenerator;
+    private AdaptiveDifficulty adaptiveDifficulty;
+    private float questionStartTime;
+    private int correctCombo = 0;
+    private float timeRemaining;
+    private bool isTimerRunning = false;
+    private int totalQuestions = 5;
 
     void Start()
     {
-        if (string.IsNullOrEmpty(levelId))
-        {
-            levelId = PlayerPrefs.GetString("CurrentLevel", "Battle_Level_1");
-        }
+        // Динамическое определение levelId
+        levelId = GetCurrentLevelId();
+
+        // Инициализация системы сложности
+        questionGenerator = new SmartQuestionGenerator();
+        adaptiveDifficulty = new AdaptiveDifficulty();
+
+        // Находим ProgressiveLevelManager если не установлен в Inspector
+        if (difficultyManager == null)
+            difficultyManager = FindObjectOfType<ProgressiveLevelManager>();
 
         GenerateQuestion();
         UpdateHearts();
+
+        Debug.Log($"Загружен уровень: {levelId}");
+    }
+
+    void Update()
+    {
+        if (isGameActive && isTimerRunning)
+        {
+            UpdateTimer();
+        }
+    }
+
+    void UpdateTimer()
+    {
+        if (timeRemaining > 0)
+        {
+            timeRemaining -= Time.deltaTime;
+
+            // Обновляем текст
+            if (timerText != null)
+                timerText.text = Mathf.CeilToInt(timeRemaining).ToString();
+
+            // Обновляем слайдер
+            if (timerSlider != null)
+            {
+                float totalTime = GetTimeLimitForCurrentLevel();
+                float fillAmount = timeRemaining / totalTime;
+                timerSlider.value = fillAmount;
+
+                // Меняем цвет в зависимости от времени
+                if (timerFillImage != null)
+                {
+                    if (fillAmount < 0.3f)
+                        timerFillImage.color = Color.red;
+                    else if (fillAmount < 0.6f)
+                        timerFillImage.color = Color.yellow;
+                    else
+                        timerFillImage.color = Color.green;
+                }
+            }
+        }
+        else
+        {
+            // Время вышло
+            TimeOut();
+        }
+    }
+
+    void TimeOut()
+    {
+        if (!isGameActive) return;
+
+        isTimerRunning = false;
+        correctCombo = 0;
+        playerHealth--;
+
+        // Записываем ошибку
+        string question = questionText.text;
+        int num1 = int.Parse(question.Split('×')[0].Trim());
+        int num2 = int.Parse(question.Split('×')[1].Split('=')[0].Trim());
+        adaptiveDifficulty.RecordMistake(num1, num2);
+
+        UpdateHearts();
+        currentQuestion++;
+
+        ShowBonusEffect("Время вышло! -1 здоровье");
+
+        if (playerHealth <= 0)
+        {
+            Defeat();
+        }
+        else if (currentQuestion < totalQuestions)
+        {
+            GenerateQuestion();
+        }
+        else
+        {
+            if (playerHealth > enemyHealth)
+                Victory();
+            else if (enemyHealth > playerHealth)
+                Defeat();
+            else
+                Draw();
+        }
+    }
+
+    float GetTimeLimitForCurrentLevel()
+    {
+        DifficultySettings difficulty = difficultyManager.GetDifficultyForLevel(levelId);
+        return difficulty.timeBonusThreshold * 2f; // Даем в 2 раза больше времени чем порог бонуса
+    }
+
+    string GetCurrentLevelId()
+    {
+        string sceneName = SceneManager.GetActiveScene().name;
+
+        if (sceneName.Contains("1")) return "Battle_Level_1";
+        else if (sceneName.Contains("2")) return "Battle_Level_2";
+        else if (sceneName.Contains("3")) return "Battle_Level_3";
+        else if (sceneName.Contains("4")) return "Battle_Level_4";
+        else if (sceneName.Contains("5")) return "Battle_Level_5";
+        else if (sceneName.Contains("6")) return "Battle_Level_6";
+        else if (sceneName.Contains("7")) return "Battle_Level_7";
+        else if (sceneName.Contains("8")) return "Battle_Level_8";
+        else return "Battle_Level_1";
     }
 
     void GenerateQuestion()
     {
         if (!isGameActive) return;
 
-        int number1 = Random.Range(2, 10);
-        int number2 = Random.Range(2, 10);
-        correctAnswer = number1 * number2;
+        // Получаем настройки сложности для текущего уровня
+        DifficultySettings difficulty = difficultyManager.GetDifficultyForLevel(levelId);
+        totalQuestions = difficulty.totalQuestions;
+        int[] weakNumbers = adaptiveDifficulty.GetWeakNumbers();
 
-        questionText.text = $"{number1} × {number2} = ?";
+        // Генерируем вопрос
+        QuestionData question = questionGenerator.GenerateQuestion(difficulty, weakNumbers);
 
+        questionText.text = $"{question.number1} × {question.number2} = ?";
+        correctAnswer = question.correctAnswer;
+        questionStartTime = Time.time;
+
+        // Запускаем таймер
+        timeRemaining = GetTimeLimitForCurrentLevel();
+        isTimerRunning = true;
+
+        // Сбрасываем слайдер и цвет
+        if (timerSlider != null)
+            timerSlider.value = 1f;
+
+        if (timerFillImage != null)
+            timerFillImage.color = Color.green;
+
+        if (timerText != null)
+            timerText.color = Color.white;
+
+        // Создаем массив ответов
         int[] answers = new int[4];
         int correctIndex = Random.Range(0, 4);
+        answers[correctIndex] = correctAnswer;
 
+        // Заполняем неправильные ответы
+        int wrongIndex = 0;
         for (int i = 0; i < 4; i++)
         {
-            if (i == correctIndex)
+            if (i != correctIndex)
             {
-                answers[i] = correctAnswer;
-            }
-            else
-            {
-                int wrongAnswer;
-                do
-                {
-                    int offset = Random.Range(1, 4);
-                    wrongAnswer = correctAnswer + (Random.Range(0, 2) == 0 ? offset : -offset);
-                } while (wrongAnswer == correctAnswer || wrongAnswer <= 0 || wrongAnswer > 81);
-
-                answers[i] = wrongAnswer;
+                answers[i] = question.wrongAnswers[wrongIndex];
+                wrongIndex++;
             }
 
             answerButtons[i].GetComponentInChildren<TMP_Text>().text = answers[i].ToString();
@@ -91,16 +234,41 @@ public class BattleLevelController : MonoBehaviour
 
     public void OnAnswerSelected(int buttonIndex, int selectedAnswer)
     {
-        if (!isGameActive) return;
+        if (!isGameActive || !isTimerRunning) return;
+
+        // Останавливаем таймер
+        isTimerRunning = false;
+
+        // Получаем настройки для определения порога бонуса
+        DifficultySettings difficulty = difficultyManager.GetDifficultyForLevel(levelId);
+        float reactionTime = Time.time - questionStartTime;
+        bool isFast = reactionTime < difficulty.timeBonusThreshold;
 
         if (selectedAnswer == correctAnswer)
         {
+            // Правильный ответ
+            correctCombo++;
             enemyHealth--;
+
+            if (isFast)
+            {
+                ShowBonusEffect($"Быстро! ({reactionTime:F1}с)");
+            }
+
             StartCoroutine(AttackEnemy());
         }
         else
         {
+            // Неправильный ответ
+            correctCombo = 0;
             playerHealth--;
+
+            // Записываем ошибку для адаптивной сложности
+            string question = questionText.text;
+            int num1 = int.Parse(question.Split('×')[0].Trim());
+            int num2 = int.Parse(question.Split('×')[1].Split('=')[0].Trim());
+            adaptiveDifficulty.RecordMistake(num1, num2);
+
             StartCoroutine(AttackPlayer());
         }
 
@@ -135,13 +303,11 @@ public class BattleLevelController : MonoBehaviour
 
     IEnumerator AttackEnemy()
     {
-        // Анимация атаки игрока для UI Image
         Vector2 originalPos = playerImage.rectTransform.anchoredPosition;
         playerImage.rectTransform.anchoredPosition = originalPos + new Vector2(50f, 0);
 
         yield return new WaitForSeconds(0.3f);
 
-        // Анимация получения урона монстром - меняем цвет
         enemyImage.color = Color.red;
 
         yield return new WaitForSeconds(0.2f);
@@ -152,13 +318,11 @@ public class BattleLevelController : MonoBehaviour
 
     IEnumerator AttackPlayer()
     {
-        // Анимация атаки монстра для UI Image
         Vector2 originalPos = enemyImage.rectTransform.anchoredPosition;
         enemyImage.rectTransform.anchoredPosition = originalPos + new Vector2(-50f, 0);
 
         yield return new WaitForSeconds(0.3f);
 
-        // Анимация получения урона игроком - меняем цвет
         playerImage.color = Color.red;
 
         yield return new WaitForSeconds(0.2f);
@@ -201,6 +365,7 @@ public class BattleLevelController : MonoBehaviour
     void Victory()
     {
         isGameActive = false;
+        isTimerRunning = false;
         starsEarned = CalculateStars();
         SaveLevelProgress(levelId, starsEarned);
         StartCoroutine(AnimateStars());
@@ -227,12 +392,14 @@ public class BattleLevelController : MonoBehaviour
     void Defeat()
     {
         isGameActive = false;
+        isTimerRunning = false;
         defeatPanel.SetActive(true);
     }
 
     void Draw()
     {
         isGameActive = false;
+        isTimerRunning = false;
         starsEarned = 1;
         SaveLevelProgress(levelId, starsEarned);
         StartCoroutine(AnimateStars());
@@ -243,15 +410,33 @@ public class BattleLevelController : MonoBehaviour
         victoryPanel.SetActive(true);
     }
 
+    void ShowBonusEffect(string message)
+    {
+        Debug.Log(message);
+
+        // Показываем текст бонуса
+        if (bonusText != null)
+        {
+            bonusText.text = message;
+            bonusText.gameObject.SetActive(true);
+            StartCoroutine(HideBonusText());
+        }
+    }
+
+    IEnumerator HideBonusText()
+    {
+        yield return new WaitForSeconds(2f);
+        if (bonusText != null)
+            bonusText.gameObject.SetActive(false);
+    }
+
     public void RestartLevel()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(
-            UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex
-        );
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void BackToMenu()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(1);
+        SceneManager.LoadScene(1);
     }
 }
