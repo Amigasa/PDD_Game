@@ -7,6 +7,7 @@ public class GalleryManager : MonoBehaviour
 {
     [Header("Ёлементы галереи")]
     public Button[] galleryButtons;
+    public Image[] galleryImage;
     public GameObject[] lockIcons;
     public TMP_Text emptyText;
 
@@ -30,12 +31,13 @@ public class GalleryManager : MonoBehaviour
             bool isUnlocked = PlayerPrefs.GetInt($"Slot_{currentSlot}_Gallery_Level_{i + 1}", 0) == 1;
 
             Image buttonImage = galleryButtons[i].GetComponent<Image>();
+            Image galleryI = galleryImage[i].GetComponent<Image>();
 
             if (isUnlocked)
             {
                 // –исунок разблокирован
                 buttonImage.sprite = drawingSprites[i];
-                buttonImage.color = Color.white;
+                galleryI.color = Color.white;
                 lockIcons[i].SetActive(false);
                 hasAnyDrawing = true;
             }
@@ -43,7 +45,7 @@ public class GalleryManager : MonoBehaviour
             {
                 // –исунок заблокирован
                 buttonImage.sprite = drawingSprites[i];
-                buttonImage.color = Color.black;
+                galleryI.color = Color.black;
                 lockIcons[i].SetActive(true);
             }
         }

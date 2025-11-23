@@ -333,32 +333,16 @@ public class ColoringController : MonoBehaviour
         {
             UnlockGalleryImage();
 
-            if (isExpertLevel)
-            {
-                victoryText.text = "ЭКСПЕРТ! ИДЕАЛЬНЫЙ РЕЗУЛЬТАТ! 🏆🎨";
-            }
-            else if (isHighLevel)
-            {
-                victoryText.text = "ОТЛИЧНО! Идеальный результат! 🎨";
-            }
-            else
-            {
-                victoryText.text = "Идеально! Рисунок добавлен в галерею! 🎨";
-            }
+            victoryText.text = "Идеально! \nРисунок добавлен в галерею!";
         }
         else
         {
             string adaptiveInfo = "";
             int[] weakNumbers = adaptiveDifficulty.GetWeakNumbers();
-            if (weakNumbers.Length > 0)
-            {
-                adaptiveInfo = $"\nПовтори: {string.Join(", ", weakNumbers.Take(2))}";
-            }
 
-            victoryText.text = $"Хорошо! Правильных ответов: {correctAnswers}/{currentDifficultySettings.totalQuestions}{adaptiveInfo}";
+            victoryText.text = $"Неплохо! Правильных ответов: {correctAnswers}/{currentDifficultySettings.totalQuestions}{adaptiveInfo}";
         }
 
-        victoryText.text += $"\nУровень сложности: {currentDifficultyLevel + 1}";
 
         victoryPanel.SetActive(true);
     }
@@ -374,10 +358,6 @@ public class ColoringController : MonoBehaviour
         {
             string adaptiveInfo = "";
             int[] weakNumbers = adaptiveDifficulty.GetWeakNumbers();
-            if (weakNumbers.Length > 0)
-            {
-                adaptiveInfo = $"\nСлабые числа: {string.Join(", ", weakNumbers.Take(2))}";
-            }
 
             defeatText.text = errorCount >= maxErrors ?
                 $"Слишком много ошибок!\nПопробуй еще раз!{adaptiveInfo}" :

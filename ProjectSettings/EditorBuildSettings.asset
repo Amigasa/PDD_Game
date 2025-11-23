@@ -25,47 +25,47 @@ EditorBuildSettings:
     guid: 32da1af5146f45a4396fa10d4abd9be2
   - enabled: 1
     path: Assets/Scenes/Battle/BattleLevel2.unity
-    guid: 1a3f18fd00141f64bac2bbfb22cfe8e4
+    guid: 489d265922838e34191a22f2baaffcaf
   - enabled: 1
     path: Assets/Scenes/Battle/BattleLevel3.unity
-    guid: c5a826b1a8feb1f409495d86aca3593e
+    guid: 54321a9d97c555c468f3a736262a185f
   - enabled: 1
     path: Assets/Scenes/Battle/BattleLevel4.unity
-    guid: a55a7cbf13e8b6f468246ff2e6f9811a
+    guid: d179e0cf5f38e4148bfbbbfb6ff7c7d3
   - enabled: 1
     path: Assets/Scenes/Battle/BattleLevel5.unity
-    guid: fe68331a03828124082a29f13c4773bd
+    guid: b39c51aa8cff20e47a62a1e088cc1d2b
   - enabled: 1
     path: Assets/Scenes/Battle/BattleLevel6.unity
-    guid: d48c4148315af614db9f441e7985f5f2
+    guid: dc2f1c4483b1f754ab5365022b3faa69
   - enabled: 1
     path: Assets/Scenes/Battle/BattleLevel7.unity
-    guid: 44d87bb488c8f8147b5db51bb10bf230
+    guid: 0ad98b776c0203b47841208bdded8219
   - enabled: 1
     path: Assets/Scenes/Battle/BattleLevel8.unity
-    guid: 3094f27a6ed95bf4887cba770bafb00d
+    guid: a0340dd04845e1d4aba0718ace7a6f92
   - enabled: 1
     path: Assets/Scenes/Color/Coloring_Level_2.unity
-    guid: a80bc0db93a74e04abef200929867727
-  - enabled: 1
-    path: Assets/Scenes/Color/Coloring_Level_3.unity
-    guid: 8cc5ff5b9f0caa44aa2ed67c343c2c3f
-  - enabled: 1
-    path: Assets/Scenes/Color/Coloring_Level_4.unity
-    guid: 94a8f91efdc585f4ea8af48585fbdad1
-  - enabled: 1
-    path: Assets/Scenes/Color/Coloring_Level_5.unity
-    guid: 6e177f5943697244eb1825ada3561ce9
-  - enabled: 1
-    path: Assets/Scenes/Color/Coloring_Level_6.unity
-    guid: 2f0935b0ba013ef48a57509ff299a6dc
-  - enabled: 1
-    path: Assets/Scenes/Color/Coloring_Level_7.unity
-    guid: ae9b891bddb2b214eafd3219e032bfaf
-  - enabled: 1
-    path: Assets/Scenes/Color/Coloring_Level_8.unity
-    guid: 257fa5608fe393146af5d7dc4503eee3
+    guid: 001d6080c61d0114f90c4da5c3ebebe1
   - enabled: 1
     path: Assets/Scenes/TutorialScene.unity
     guid: eacccca1cb284b546885f5211755559a
+  - enabled: 0
+    path: Assets/Scenes/Color/Coloring_Level_3.unity
+    guid: 8cc5ff5b9f0caa44aa2ed67c343c2c3f
+  - enabled: 0
+    path: Assets/Scenes/Color/Coloring_Level_4.unity
+    guid: 94a8f91efdc585f4ea8af48585fbdad1
+  - enabled: 0
+    path: Assets/Scenes/Color/Coloring_Level_5.unity
+    guid: 6e177f5943697244eb1825ada3561ce9
+  - enabled: 0
+    path: Assets/Scenes/Color/Coloring_Level_6.unity
+    guid: 2f0935b0ba013ef48a57509ff299a6dc
+  - enabled: 0
+    path: Assets/Scenes/Color/Coloring_Level_7.unity
+    guid: ae9b891bddb2b214eafd3219e032bfaf
+  - enabled: 0
+    path: Assets/Scenes/Color/Coloring_Level_8.unity
+    guid: 257fa5608fe393146af5d7dc4503eee3
   m_configObjects: {}
