@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class AudioManager : MonoBehaviour
 {
@@ -50,6 +51,7 @@ public class AudioManager : MonoBehaviour
     public float uiVolume = 1.0f;
 
     private Dictionary<string, AudioClip> soundDictionary = new Dictionary<string, AudioClip>();
+    private string currentMusic = "";
 
     void Awake()
     {
@@ -69,6 +71,12 @@ public class AudioManager : MonoBehaviour
     {
         // Загружаем настройки громкости
         LoadAudioSettings();
+
+        // Автоматически включаем музыку для текущей сцены
+        PlayMusicForScene(SceneManager.GetActiveScene().name);
+
+        // Следим за сменой сцен
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     void InitializeSoundDictionary()
@@ -107,14 +115,201 @@ public class AudioManager : MonoBehaviour
         soundDictionary["DrawingComplete"] = drawingComplete;
     }
 
-    // === УПРАВЛЕНИЕ МУЗЫКОЙ ===
-    public void PlayMusic(string musicName)
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (soundDictionary.ContainsKey(musicName) && soundDictionary[musicName] != null)
+        Debug.Log($"AudioManager: Смена сцены на {scene.name}");
+        PlayMusicForScene(scene.name);
+    }
+
+    public void PlayMusicForScene(string sceneName)
+    {
+        string requiredMusic = GetMusicForScene(sceneName);
+
+        // Если уже играет нужная музыка - не переключаем
+        if (currentMusic == requiredMusic)
         {
-            musicSource.clip = soundDictionary[musicName];
+            Debug.Log($"AudioManager: Музыка уже играет ({currentMusic})");
+            return;
+        }
+
+        Debug.Log($"AudioManager: Переключаю музыку {currentMusic} -> {requiredMusic}");
+        currentMusic = requiredMusic;
+
+        switch (sceneName)
+        {
+            case "MainMenu":
+                PlayMainMenuMusic();
+                break;
+            case "Gallery":
+                PlayGalleryMusic();
+                break;
+            case "Tutorial":
+                PlayTutorialMusic();
+                break;
+            case "Man":
+                PlayBattleMapMusic();
+                break;
+            case "Woman":
+                PlayColoringMapMusic();
+                break;
+            case "BattleLevel":
+            case "BattleLevel1":
+            case "BattleLevel2":
+            case "BattleLevel3":
+            case "BattleLevel4":
+            case "BattleLevel5":
+            case "BattleLevel6":
+            case "BattleLevel7":
+            case "BattleLevel8":
+                PlayBattleGameMusic();
+                break;
+            case "ColoringLevel":
+            case "ColoringLevel1":
+            case "ColoringLevel2":
+            case "ColoringLevel3":
+            case "ColoringLevel4":
+            case "ColoringLevel5":
+            case "ColoringLevel6":
+            case "ColoringLevel7":
+            case "ColoringLevel8":
+                PlayColoringGameMusic();
+                break;
+            default:
+                // Для любых других сцен используем музыку главного меню
+                PlayMainMenuMusic();
+                break;
+        }
+    }
+
+    string GetMusicForScene(string sceneName)
+    {
+        switch (sceneName)
+        {
+            case "MainMenu": return "MainMenu";
+            case "Gallery": return "Gallery";
+            case "Tutorial": return "Tutorial";
+            case "Man": return "BattleMap";
+            case "Woman": return "ColoringMap";
+            case "BattleLevel":
+            case "BattleLevel1":
+            case "BattleLevel2":
+            case "BattleLevel3":
+            case "BattleLevel4":
+            case "BattleLevel5":
+            case "BattleLevel6":
+            case "BattleLevel7":
+            case "BattleLevel8":
+                return "BattleGame";
+            case "ColoringLevel":
+            case "ColoringLevel1":
+            case "ColoringLevel2":
+            case "ColoringLevel3":
+            case "ColoringLevel4":
+            case "ColoringLevel5":
+            case "ColoringLevel6":
+            case "ColoringLevel7":
+            case "ColoringLevel8":
+                return "ColoringGame";
+            default: return "MainMenu";
+        }
+    }
+
+    // === УПРАВЛЕНИЕ МУЗЫКОЙ ===
+    public void PlayMainMenuMusic()
+    {
+        if (mainMenuMusic != null)
+        {
+            musicSource.clip = mainMenuMusic;
             musicSource.volume = musicVolume;
             musicSource.loop = true;
+            musicSource.Play();
+        }
+    }
+
+    public void PlayGalleryMusic()
+    {
+        if (galleryMusic != null)
+        {
+            musicSource.clip = galleryMusic;
+            musicSource.volume = musicVolume;
+            musicSource.loop = true;
+            musicSource.Play();
+        }
+    }
+
+    public void PlayTutorialMusic()
+    {
+        if (tutorialMusic != null)
+        {
+            musicSource.clip = tutorialMusic;
+            musicSource.volume = musicVolume;
+            musicSource.loop = true;
+            musicSource.Play();
+        }
+    }
+
+    public void PlayBattleMapMusic()
+    {
+        if (battleMapMusic != null)
+        {
+            musicSource.clip = battleMapMusic;
+            musicSource.volume = musicVolume;
+            musicSource.loop = true;
+            musicSource.Play();
+        }
+    }
+
+    public void PlayColoringMapMusic()
+    {
+        if (coloringMapMusic != null)
+        {
+            musicSource.clip = coloringMapMusic;
+            musicSource.volume = musicVolume;
+            musicSource.loop = true;
+            musicSource.Play();
+        }
+    }
+
+    public void PlayBattleGameMusic()
+    {
+        if (battleGameMusic != null)
+        {
+            musicSource.clip = battleGameMusic;
+            musicSource.volume = musicVolume;
+            musicSource.loop = true;
+            musicSource.Play();
+        }
+    }
+
+    public void PlayColoringGameMusic()
+    {
+        if (coloringGameMusic != null)
+        {
+            musicSource.clip = coloringGameMusic;
+            musicSource.volume = musicVolume;
+            musicSource.loop = true;
+            musicSource.Play();
+        }
+    }
+
+    public void PlayVictoryMusic()
+    {
+        if (victoryMusic != null)
+        {
+            musicSource.clip = victoryMusic;
+            musicSource.volume = musicVolume;
+            musicSource.loop = false;
+            musicSource.Play();
+        }
+    }
+
+    public void PlayDefeatMusic()
+    {
+        if (defeatMusic != null)
+        {
+            musicSource.clip = defeatMusic;
+            musicSource.volume = musicVolume;
+            musicSource.loop = false;
             musicSource.Play();
         }
     }
@@ -122,37 +317,6 @@ public class AudioManager : MonoBehaviour
     public void StopMusic()
     {
         musicSource.Stop();
-    }
-
-    public void PauseMusic()
-    {
-        musicSource.Pause();
-    }
-
-    public void ResumeMusic()
-    {
-        musicSource.UnPause();
-    }
-
-    public void PlayVictoryMusic()
-    {
-        PlayOneShotMusic(victoryMusic);
-    }
-
-    public void PlayDefeatMusic()
-    {
-        PlayOneShotMusic(defeatMusic);
-    }
-
-    private void PlayOneShotMusic(AudioClip clip)
-    {
-        if (clip != null)
-        {
-            musicSource.clip = clip;
-            musicSource.volume = musicVolume;
-            musicSource.loop = false;
-            musicSource.Play();
-        }
     }
 
     // === ЗВУКИ SFX ===
@@ -228,12 +392,8 @@ public class AudioManager : MonoBehaviour
         musicSource.volume = musicVolume;
     }
 
-    // === БЫСТРЫЕ МЕТОДЫ ДЛЯ КОНКРЕТНЫХ СЦЕН ===
-    public void PlayMainMenuMusic() => PlayMusic("MainMenuMusic");
-    public void PlayGalleryMusic() => PlayMusic("GalleryMusic");
-    public void PlayTutorialMusic() => PlayMusic("TutorialMusic");
-    public void PlayBattleMapMusic() => PlayMusic("BattleMapMusic");
-    public void PlayColoringMapMusic() => PlayMusic("ColoringMapMusic");
-    public void PlayBattleGameMusic() => PlayMusic("BattleGameMusic");
-    public void PlayColoringGameMusic() => PlayMusic("ColoringGameMusic");
+    void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
 }

@@ -1,4 +1,4 @@
-using UnityEngine;
+п»їusing UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
@@ -14,43 +14,182 @@ public class AudioSettingsPanel : MonoBehaviour
     public TMP_Text sfxText;
     public TMP_Text uiText;
 
+    [Header("Mute Buttons")]
+    public Button musicMuteButton;
+    public Button sfxMuteButton;
+    public Button uiMuteButton;
+
+    private bool isMusicMuted = false;
+    private bool isSFXMuted = false;
+    private bool isUIMuted = false;
+    private float musicVolumeBeforeMute;
+    private float sfxVolumeBeforeMute;
+    private float uiVolumeBeforeMute;
+
     void Start()
     {
-        // Загружаем текущие настройки
+        InitializeSettings();
+        SetupEventListeners();
+    }
+
+    void InitializeSettings()
+    {
+        // Р—Р°РіСЂСѓР¶Р°РµРј С‚РµРєСѓС‰РёРµ РЅР°СЃС‚СЂРѕР№РєРё
         musicSlider.value = AudioManager.Instance.musicVolume;
         sfxSlider.value = AudioManager.Instance.sfxVolume;
         uiSlider.value = AudioManager.Instance.uiVolume;
 
         UpdateTexts();
+        UpdateMuteButtons();
+    }
 
-        // Подписываемся на изменения
+    void SetupEventListeners()
+    {
+        // РЎР»Р°Р№РґРµСЂС‹
         musicSlider.onValueChanged.AddListener(OnMusicVolumeChanged);
         sfxSlider.onValueChanged.AddListener(OnSFXVolumeChanged);
         uiSlider.onValueChanged.AddListener(OnUIVolumeChanged);
+
+        // РљРЅРѕРїРєРё mute
+        if (musicMuteButton != null)
+            musicMuteButton.onClick.AddListener(ToggleMusicMute);
+        if (sfxMuteButton != null)
+            sfxMuteButton.onClick.AddListener(ToggleSFXMute);
+        if (uiMuteButton != null)
+            uiMuteButton.onClick.AddListener(ToggleUIMute);
     }
 
     void OnMusicVolumeChanged(float value)
     {
         AudioManager.Instance.SetMusicVolume(value);
-        musicText.text = $"Музыка: {Mathf.RoundToInt(value * 100)}%";
+        musicText.text = $"{Mathf.RoundToInt(value * 100)}%";
+
+        // Р•СЃР»Рё РІРєР»СЋС‡Р°РµРј Р·РІСѓРє РїРѕСЃР»Рµ mute - СЃРЅРёРјР°РµРј mute
+        if (isMusicMuted && value > 0)
+        {
+            isMusicMuted = false;
+            UpdateMuteButtons();
+        }
     }
 
     void OnSFXVolumeChanged(float value)
     {
         AudioManager.Instance.SetSFXVolume(value);
-        sfxText.text = $"Звуки: {Mathf.RoundToInt(value * 100)}%";
+        sfxText.text = $"{Mathf.RoundToInt(value * 100)}%";
+
+        if (isSFXMuted && value > 0)
+        {
+            isSFXMuted = false;
+            UpdateMuteButtons();
+        }
     }
 
     void OnUIVolumeChanged(float value)
     {
         AudioManager.Instance.SetUIVolume(value);
-        uiText.text = $"Интерфейс: {Mathf.RoundToInt(value * 100)}%";
+        uiText.text = $"{Mathf.RoundToInt(value * 100)}%";
+
+        if (isUIMuted && value > 0)
+        {
+            isUIMuted = false;
+            UpdateMuteButtons();
+        }
+    }
+
+    void ToggleMusicMute()
+    {
+        if (!isMusicMuted)
+        {
+            // Mute
+            musicVolumeBeforeMute = musicSlider.value;
+            musicSlider.value = 0;
+            isMusicMuted = true;
+        }
+        else
+        {
+            // Unmute
+            musicSlider.value = musicVolumeBeforeMute > 0 ? musicVolumeBeforeMute : 0.7f;
+            isMusicMuted = false;
+        }
+        UpdateMuteButtons();
+    }
+
+    void ToggleSFXMute()
+    {
+        if (!isSFXMuted)
+        {
+            sfxVolumeBeforeMute = sfxSlider.value;
+            sfxSlider.value = 0;
+            isSFXMuted = true;
+        }
+        else
+        {
+            sfxSlider.value = sfxVolumeBeforeMute > 0 ? sfxVolumeBeforeMute : 1.0f;
+            isSFXMuted = false;
+        }
+        UpdateMuteButtons();
+    }
+
+    void ToggleUIMute()
+    {
+        if (!isUIMuted)
+        {
+            uiVolumeBeforeMute = uiSlider.value;
+            uiSlider.value = 0;
+            isUIMuted = true;
+        }
+        else
+        {
+            uiSlider.value = uiVolumeBeforeMute > 0 ? uiVolumeBeforeMute : 1.0f;
+            isUIMuted = false;
+        }
+        UpdateMuteButtons();
     }
 
     void UpdateTexts()
     {
-        musicText.text = $"Музыка: {Mathf.RoundToInt(musicSlider.value * 100)}%";
-        sfxText.text = $"Звуки: {Mathf.RoundToInt(sfxSlider.value * 100)}%";
-        uiText.text = $"Интерфейс: {Mathf.RoundToInt(uiSlider.value * 100)}%";
+        musicText.text = $"{Mathf.RoundToInt(musicSlider.value * 100)}%";
+        sfxText.text = $"{Mathf.RoundToInt(sfxSlider.value * 100)}%";
+        uiText.text = $"{Mathf.RoundToInt(uiSlider.value * 100)}%";
+    }
+
+    void UpdateMuteButtons()
+    {
+        // РћР±РЅРѕРІР»СЏРµРј С‚РµРєСЃС‚ РєРЅРѕРїРѕРє mute
+        if (musicMuteButton != null)
+        {
+            TextMeshProUGUI muteText = musicMuteButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (muteText != null)
+                muteText.text = isMusicMuted ? "рџ”€" : "рџ”‡";
+        }
+
+        if (sfxMuteButton != null)
+        {
+            TextMeshProUGUI muteText = sfxMuteButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (muteText != null)
+                muteText.text = isSFXMuted ? "рџ”€" : "рџ”‡";
+        }
+
+        if (uiMuteButton != null)
+        {
+            TextMeshProUGUI muteText = uiMuteButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (muteText != null)
+                muteText.text = isUIMuted ? "рџ”€" : "рџ”‡";
+        }
+    }
+
+    // РњРµС‚РѕРґС‹ РґР»СЏ РѕС‚РєСЂС‹С‚РёСЏ/Р·Р°РєСЂС‹С‚РёСЏ РїР°РЅРµР»Рё
+    public void ShowPanel()
+    {
+        gameObject.SetActive(true);
+        // Р—РІСѓРє РѕС‚РєСЂС‹С‚РёСЏ РїР°РЅРµР»Рё
+        AudioManager.Instance.PlayUI("PanelOpen");
+    }
+
+    public void HidePanel()
+    {
+        gameObject.SetActive(false);
+        // Р—РІСѓРє Р·Р°РєСЂС‹С‚РёСЏ РїР°РЅРµР»Рё
+        AudioManager.Instance.PlayUI("PanelClose");
     }
 }

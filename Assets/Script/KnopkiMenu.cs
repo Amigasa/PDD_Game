@@ -10,8 +10,8 @@ public class KnopkiMenu : MonoBehaviour
     [SerializeField] private GameObject SavePanel;
     [SerializeField] private GameObject MenuPanel;
     [SerializeField] private GameObject RejimiPanel;
+    [SerializeField] private GameObject SettingPanel;
 
-    // Добавь эти методы:
     public void ShowGallery()
     {
         SceneManager.LoadScene(4);
@@ -33,6 +33,16 @@ public class KnopkiMenu : MonoBehaviour
     {
         RejimiPanel.SetActive(false);
         SavePanel.SetActive(true);
+    }
+    public void OnSettingsButtonClick()
+    {
+        MenuPanel.SetActive(false);
+        SettingPanel.SetActive(true);
+    }
+    public void Exxxx()//Кнопка назад для выхода в меню
+    {
+        SettingPanel.SetActive(false);
+        MenuPanel.SetActive(true);
     }
     public void Exit()//Кнопка выхода в главном меню
     {
