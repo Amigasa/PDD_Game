@@ -37,6 +37,12 @@ public class TutorialManager : MonoBehaviour
 
     void Start()
     {
+        // Воспроизводим музыку для обучения
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayTutorialMusic();
+        }
+
         backButton.onClick.AddListener(BackToMainMenu);
 
         // Начинаем первый диалог
@@ -48,7 +54,7 @@ public class TutorialManager : MonoBehaviour
         if (index >= dialogues.Length)
         {
             // Диалоги закончились, возвращаем в меню
-            BackToMainMenu();
+            CompleteTutorial();
             return;
         }
 
@@ -62,11 +68,23 @@ public class TutorialManager : MonoBehaviour
         {
             character1Image.color = activeColor;
             character2Image.color = inactiveColor;
+
+            // Звук смены говорящего на персонажа 1
+            if (AudioManager.Instance != null && currentDialogueIndex > 0)
+            {
+                AudioManager.Instance.PlaySFX("PanelOpen");
+            }
         }
         else
         {
             character1Image.color = inactiveColor;
             character2Image.color = activeColor;
+
+            // Звук смены говорящего на персонажа 2
+            if (AudioManager.Instance != null && currentDialogueIndex > 0)
+            {
+                AudioManager.Instance.PlaySFX("PanelOpen");
+            }
         }
 
         // Запускаем анимацию печати текста
@@ -84,14 +102,33 @@ public class TutorialManager : MonoBehaviour
         foreach (char letter in sentence.ToCharArray())
         {
             dialogueText.text += letter;
+
+            // Звук печати текста (воспроизводим не для каждого символа, чтобы не было слишком часто)
+            if (AudioManager.Instance != null && letter != ' ' && Random.Range(0, 3) == 0)
+            {
+                AudioManager.Instance.PlaySFX("ButtonClick");
+            }
+
             yield return new WaitForSeconds(typingSpeed);
         }
 
         isTyping = false;
+
+        // Звук завершения печати текста
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX("PanelClose");
+        }
     }
 
     void ContinueDialogue()
     {
+        // Звук продолжения диалога
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayButtonClick();
+        }
+
         if (isTyping)
         {
             // Если текст еще печатается, завершить печать
@@ -100,6 +137,12 @@ public class TutorialManager : MonoBehaviour
 
             dialogueText.text = dialogues[currentDialogueIndex].sentence;
             isTyping = false;
+
+            // Звук пропуска текста
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySFX("PanelClose");
+            }
             return;
         }
 
@@ -107,8 +150,28 @@ public class TutorialManager : MonoBehaviour
         ShowDialogue(currentDialogueIndex);
     }
 
+    void CompleteTutorial()
+    {
+        // Сохраняем пройденное обучение
+        PlayerPrefs.SetInt("TutorialCompleted", 1);
+        PlayerPrefs.Save();
+
+        // Звук завершения обучения
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX("LevelComplete");
+        }
+
+        BackToMainMenu();
+    }
+
     void BackToMainMenu()
     {
+        // Звук кнопки возврата
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayButtonClick();
+        }
         SceneManager.LoadScene(0); // Замените на имя вашей сцены главного меню
     }
 
@@ -118,6 +181,40 @@ public class TutorialManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
         {
             ContinueDialogue();
+        }
+
+        // Кнопка Назад на Android
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            BackToMainMenu();
+        }
+    }
+
+    // Методы для кнопок (если нужно привязать к UI)
+    public void OnBackButtonClicked()
+    {
+        BackToMainMenu();
+    }
+
+    public void OnContinueButtonClicked() // Если добавите кнопку продолжения
+    {
+        ContinueDialogue();
+    }
+
+    // Дополнительные методы для управления звуками
+    public void PlayButtonSound()
+    {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayButtonClick();
+        }
+    }
+
+    public void PlayHoverSound()
+    {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayButtonHover();
         }
     }
 }

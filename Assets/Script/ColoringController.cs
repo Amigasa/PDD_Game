@@ -51,6 +51,12 @@ public class ColoringController : MonoBehaviour
         // Определяем текущий уровень сложности на основе levelId
         currentDifficultyLevel = progressiveLevelManager.ExtractLevelNumber(levelId) - 1;
 
+        // Воспроизводим музыку для режима раскраски
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayColoringGameMusic();
+        }
+
         InitializeDrawing();
         UpdateDifficultyDisplay();
         GenerateQuestion();
@@ -226,11 +232,24 @@ public class ColoringController : MonoBehaviour
 
         if (selectedAnswer == correctAnswer)
         {
+            // Звуки правильного ответа
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySFX("ColoringCorrectAnswer");
+                AudioManager.Instance.PlaySFX("ColorAppear");
+            }
+
             correctAnswers++;
             ShowPart(currentQuestion, true);
         }
         else
         {
+            // Звуки неправильного ответа
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySFX("ColoringWrongAnswer");
+            }
+
             errorCount++;
 
             // Записываем ошибку в адаптивную систему
@@ -326,6 +345,19 @@ public class ColoringController : MonoBehaviour
 
         SaveLevelProgress(isPerfect);
 
+        // Звуки победы
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayVictoryMusic();
+            AudioManager.Instance.PlaySFX("DrawingComplete");
+
+            // Дополнительный звук для идеального результата
+            if (isPerfect)
+            {
+                AudioManager.Instance.PlaySFX("StarAppear");
+            }
+        }
+
         bool isHighLevel = currentDifficultyLevel >= 5;
         bool isExpertLevel = currentDifficultyLevel >= 7;
 
@@ -343,7 +375,6 @@ public class ColoringController : MonoBehaviour
             victoryText.text = $"Неплохо! Правильных ответов: {correctAnswers}/{currentDifficultySettings.totalQuestions}{adaptiveInfo}";
         }
 
-
         victoryPanel.SetActive(true);
     }
 
@@ -352,6 +383,12 @@ public class ColoringController : MonoBehaviour
         isGameActive = false;
 
         SaveLevelProgress(false);
+
+        // Звуки поражения
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayDefeatMusic();
+        }
 
         TMP_Text defeatText = defeatPanel.GetComponentInChildren<TMP_Text>();
         if (defeatText != null)
@@ -406,16 +443,32 @@ public class ColoringController : MonoBehaviour
     // Кнопки UI
     public void RestartLevel()
     {
+        // Звук кнопки перезапуска
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayButtonClick();
+        }
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void BackToMenu()
     {
+        // Звук кнопки возврата
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayButtonClick();
+        }
         SceneManager.LoadScene(2);
     }
 
     public void LoadNextLevel()
     {
+        // Звук кнопки следующего уровня
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayButtonClick();
+        }
+
         int currentLevel = progressiveLevelManager.ExtractLevelNumber(levelId);
         int nextLevel = currentLevel + 1;
 
@@ -434,6 +487,23 @@ public class ColoringController : MonoBehaviour
         else
         {
             BackToMenu();
+        }
+    }
+
+    // Дополнительные методы для управления звуками
+    public void PlayButtonSound()
+    {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayButtonClick();
+        }
+    }
+
+    public void PlayHoverSound()
+    {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayButtonHover();
         }
     }
 }
