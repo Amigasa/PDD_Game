@@ -71,7 +71,7 @@ public class BattleLevelController : MonoBehaviour
             difficultyManager = FindObjectOfType<ProgressiveLevelManager>();
 
         // Воспроизводим музыку для битвы
-        if (AudioManager.Instance != null)
+        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
         {
             AudioManager.Instance.PlayBattleGameMusic();
         }
@@ -141,9 +141,9 @@ public class BattleLevelController : MonoBehaviour
         adaptiveDifficulty.RecordMistake(num1, num2);
 
         // Звук при потере времени
-        if (AudioManager.Instance != null)
+        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
         {
-            AudioManager.Instance.PlaySFX("BattleWrongAnswer");
+            AudioManager.Instance.PlayBattleWrongAnswer();
             AudioManager.Instance.PlaySFX("PlayerDamage");
         }
 
@@ -264,9 +264,9 @@ public class BattleLevelController : MonoBehaviour
             enemyHealth--;
 
             // Звуки правильного ответа
-            if (AudioManager.Instance != null)
+            if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
             {
-                AudioManager.Instance.PlaySFX("BattleCorrectAnswer");
+                AudioManager.Instance.PlayBattleCorrectAnswer();
                 AudioManager.Instance.PlaySFX("PlayerAttack");
                 AudioManager.Instance.PlaySFX("EnemyDamage");
 
@@ -291,9 +291,9 @@ public class BattleLevelController : MonoBehaviour
             playerHealth--;
 
             // Звуки неправильного ответа
-            if (AudioManager.Instance != null)
+            if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
             {
-                AudioManager.Instance.PlaySFX("BattleWrongAnswer");
+                AudioManager.Instance.PlayBattleWrongAnswer();
                 AudioManager.Instance.PlaySFX("EnemyAttack");
                 AudioManager.Instance.PlaySFX("PlayerDamage");
             }
@@ -384,7 +384,7 @@ public class BattleLevelController : MonoBehaviour
                 victoryStars[i].transform.localScale = Vector3.zero;
 
                 // Звук появления звезды
-                if (AudioManager.Instance != null)
+                if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
                 {
                     AudioManager.Instance.PlaySFX("StarAppear");
                 }
@@ -403,7 +403,7 @@ public class BattleLevelController : MonoBehaviour
         }
 
         // Звук завершения уровня после анимации звезд
-        if (AudioManager.Instance != null)
+        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
         {
             AudioManager.Instance.PlaySFX("LevelComplete");
         }
@@ -417,7 +417,7 @@ public class BattleLevelController : MonoBehaviour
         SaveLevelProgress(levelId, starsEarned);
 
         // Музыка победы
-        if (AudioManager.Instance != null)
+        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
         {
             AudioManager.Instance.PlayVictoryMusic();
         }
@@ -436,6 +436,8 @@ public class BattleLevelController : MonoBehaviour
         PlayerPrefs.SetInt($"Slot_{currentSlot}_{levelId}_stars", stars);
         PlayerPrefs.SetInt($"Slot_{currentSlot}_{levelId}_completed", 1);
         PlayerPrefs.Save();
+
+        Debug.Log($"Сохранен прогресс уровня {levelId}: {stars} звезд(ы)");
     }
 
     int CalculateStars()
@@ -449,7 +451,7 @@ public class BattleLevelController : MonoBehaviour
         isTimerRunning = false;
 
         // Музыка поражения
-        if (AudioManager.Instance != null)
+        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
         {
             AudioManager.Instance.PlayDefeatMusic();
         }
@@ -465,7 +467,7 @@ public class BattleLevelController : MonoBehaviour
         SaveLevelProgress(levelId, starsEarned);
 
         // Нейтральная музыка для ничьей
-        if (AudioManager.Instance != null)
+        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
         {
             AudioManager.Instance.PlayDefeatMusic(); // Или создайте отдельный звук для ничьей
         }
@@ -501,7 +503,7 @@ public class BattleLevelController : MonoBehaviour
     public void RestartLevel()
     {
         // Звук кнопки перезапуска
-        if (AudioManager.Instance != null)
+        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
         {
             AudioManager.Instance.PlayButtonClick();
         }
@@ -511,17 +513,46 @@ public class BattleLevelController : MonoBehaviour
     public void BackToMenu()
     {
         // Звук кнопки возврата
-        if (AudioManager.Instance != null)
+        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
         {
             AudioManager.Instance.PlayButtonClick();
         }
         SceneManager.LoadScene(1);
     }
 
+    public void LoadNextLevel()
+    {
+        // Звук кнопки следующего уровня
+        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
+        {
+            AudioManager.Instance.PlayButtonClick();
+        }
+
+        int currentLevel = ExtractLevelNumber(levelId);
+        int nextLevel = currentLevel + 1;
+
+        if (nextLevel <= 8)
+        {
+            string nextSceneName = $"BattleLevel{nextLevel}";
+            if (Application.CanStreamedLevelBeLoaded(nextSceneName))
+            {
+                SceneManager.LoadScene(nextSceneName);
+            }
+            else
+            {
+                BackToMenu();
+            }
+        }
+        else
+        {
+            BackToMenu();
+        }
+    }
+
     // Дополнительные методы для управления звуками
     public void PlayButtonSound()
     {
-        if (AudioManager.Instance != null)
+        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
         {
             AudioManager.Instance.PlayButtonClick();
         }
@@ -529,9 +560,45 @@ public class BattleLevelController : MonoBehaviour
 
     public void PlayHoverSound()
     {
-        if (AudioManager.Instance != null)
+        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
         {
             AudioManager.Instance.PlayButtonHover();
         }
+    }
+
+    private int ExtractLevelNumber(string levelId)
+    {
+        foreach (char c in levelId)
+        {
+            if (char.IsDigit(c))
+            {
+                return int.Parse(c.ToString());
+            }
+        }
+        return 1;
+    }
+
+    // Метод для отладки звуков (можно удалить в финальной версии)
+    public void TestBattleSounds()
+    {
+        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
+        {
+            StartCoroutine(TestSoundsCoroutine());
+        }
+    }
+
+    private IEnumerator TestSoundsCoroutine()
+    {
+        AudioManager.Instance.PlayBattleCorrectAnswer();
+        yield return new WaitForSeconds(0.5f);
+        AudioManager.Instance.PlayBattleWrongAnswer();
+        yield return new WaitForSeconds(0.5f);
+        AudioManager.Instance.PlaySFX("PlayerAttack");
+        yield return new WaitForSeconds(0.5f);
+        AudioManager.Instance.PlaySFX("EnemyAttack");
+        yield return new WaitForSeconds(0.5f);
+        AudioManager.Instance.PlaySFX("StarAppear");
+        yield return new WaitForSeconds(0.5f);
+        AudioManager.Instance.PlaySFX("LevelComplete");
     }
 }

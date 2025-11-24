@@ -52,7 +52,7 @@ public class ColoringController : MonoBehaviour
         currentDifficultyLevel = progressiveLevelManager.ExtractLevelNumber(levelId) - 1;
 
         // Воспроизводим музыку для режима раскраски
-        if (AudioManager.Instance != null)
+        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
         {
             AudioManager.Instance.PlayColoringGameMusic();
         }
@@ -233,10 +233,10 @@ public class ColoringController : MonoBehaviour
         if (selectedAnswer == correctAnswer)
         {
             // Звуки правильного ответа
-            if (AudioManager.Instance != null)
+            if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
             {
-                AudioManager.Instance.PlaySFX("ColoringCorrectAnswer");
-                AudioManager.Instance.PlaySFX("ColorAppear");
+                AudioManager.Instance.PlayColoringCorrectAnswer();
+                AudioManager.Instance.PlayColorAppearSound();
             }
 
             correctAnswers++;
@@ -245,9 +245,9 @@ public class ColoringController : MonoBehaviour
         else
         {
             // Звуки неправильного ответа
-            if (AudioManager.Instance != null)
+            if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
             {
-                AudioManager.Instance.PlaySFX("ColoringWrongAnswer");
+                AudioManager.Instance.PlayColoringWrongAnswer();
             }
 
             errorCount++;
@@ -352,7 +352,7 @@ public class ColoringController : MonoBehaviour
         SaveLevelProgress(isPerfect);
 
         // Звуки победы
-        if (AudioManager.Instance != null)
+        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
         {
             AudioManager.Instance.PlayVictoryMusic();
             AudioManager.Instance.PlaySFX("DrawingComplete");
@@ -360,20 +360,29 @@ public class ColoringController : MonoBehaviour
             // Дополнительный звук для идеального результата
             if (isPerfect)
             {
-                AudioManager.Instance.PlaySFX("StarAppear");
+                AudioManager.Instance.PlayStarAppearSound();
             }
         }
 
         if (isPerfect)
         {
             UnlockGalleryImage();
-            victoryText.text = "Идеально! \nРисунок добавлен в галерею!";
+            victoryText.text = "Идеально! \nРисунок добавлен в галерею! 🎨";
         }
         else
         {
             // 1-2 ошибки
             victoryText.text = $"Неплохо!\nПравильных ответов: {correctAnswers}/{currentDifficultySettings.totalQuestions}";
+
+            // Добавляем рекомендации по слабым числам
+            int[] weakNumbers = adaptiveDifficulty.GetWeakNumbers();
+            if (weakNumbers.Length > 0)
+            {
+                victoryText.text += $"\nПовтори: {string.Join(", ", weakNumbers.Take(2))}";
+            }
         }
+
+        victoryText.text += $"\nУровень сложности: {currentDifficultyLevel + 1}";
 
         victoryPanel.SetActive(true);
     }
@@ -385,7 +394,7 @@ public class ColoringController : MonoBehaviour
         SaveLevelProgress(false);
 
         // Звуки поражения
-        if (AudioManager.Instance != null)
+        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
         {
             AudioManager.Instance.PlayDefeatMusic();
         }
@@ -393,17 +402,26 @@ public class ColoringController : MonoBehaviour
         TMP_Text defeatText = defeatPanel.GetComponentInChildren<TMP_Text>();
         if (defeatText != null)
         {
+            string adaptiveInfo = "";
+            int[] weakNumbers = adaptiveDifficulty.GetWeakNumbers();
+            if (weakNumbers.Length > 0)
+            {
+                adaptiveInfo = $"\nСлабые числа: {string.Join(", ", weakNumbers.Take(2))}";
+            }
+
             if (errorCount >= maxErrors)
             {
                 // Слишком много ошибок (maxErrors и больше)
-                defeatText.text = "Слишком много ошибок!\nПопробуй еще раз!";
+                defeatText.text = $"Слишком много ошибок!\nПопробуй еще раз!{adaptiveInfo}";
             }
             else
             {
                 // 3-4 ошибки
-                defeatText.text = $"Почти получилось!\nПравильных ответов: {correctAnswers}/{currentDifficultySettings.totalQuestions}";
+                defeatText.text = $"Почти получилось!\nПравильных ответов: {correctAnswers}/{currentDifficultySettings.totalQuestions}{adaptiveInfo}";
             }
         }
+
+        defeatText.text += $"\nУровень сложности: {currentDifficultyLevel + 1}";
 
         defeatPanel.SetActive(true);
     }
@@ -425,6 +443,14 @@ public class ColoringController : MonoBehaviour
 
         string starsKey = $"Slot_{currentSlot}_{levelId}_stars";
         PlayerPrefs.SetInt(starsKey, totalStars);
+
+        // Сохраняем максимальный достигнутый уровень сложности
+        string maxDifficultyKey = $"Slot_{currentSlot}_{levelId}_maxLevel";
+        int currentMax = PlayerPrefs.GetInt(maxDifficultyKey, 0);
+        if (currentDifficultyLevel > currentMax)
+        {
+            PlayerPrefs.SetInt(maxDifficultyKey, currentDifficultyLevel);
+        }
 
         PlayerPrefs.Save();
 
@@ -448,7 +474,7 @@ public class ColoringController : MonoBehaviour
     public void RestartLevel()
     {
         // Звук кнопки перезапуска
-        if (AudioManager.Instance != null)
+        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
         {
             AudioManager.Instance.PlayButtonClick();
         }
@@ -458,7 +484,7 @@ public class ColoringController : MonoBehaviour
     public void BackToMenu()
     {
         // Звук кнопки возврата
-        if (AudioManager.Instance != null)
+        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
         {
             AudioManager.Instance.PlayButtonClick();
         }
@@ -468,7 +494,7 @@ public class ColoringController : MonoBehaviour
     public void LoadNextLevel()
     {
         // Звук кнопки следующего уровня
-        if (AudioManager.Instance != null)
+        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
         {
             AudioManager.Instance.PlayButtonClick();
         }
@@ -497,7 +523,7 @@ public class ColoringController : MonoBehaviour
     // Дополнительные методы для управления звуками
     public void PlayButtonSound()
     {
-        if (AudioManager.Instance != null)
+        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
         {
             AudioManager.Instance.PlayButtonClick();
         }
@@ -505,9 +531,48 @@ public class ColoringController : MonoBehaviour
 
     public void PlayHoverSound()
     {
-        if (AudioManager.Instance != null)
+        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
         {
             AudioManager.Instance.PlayButtonHover();
         }
+    }
+
+    // Метод для отладки звуков (можно удалить в финальной версии)
+    public void TestColoringSounds()
+    {
+        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
+        {
+            StartCoroutine(TestSoundsCoroutine());
+        }
+    }
+
+    private IEnumerator TestSoundsCoroutine()
+    {
+        AudioManager.Instance.PlayColoringCorrectAnswer();
+        yield return new WaitForSeconds(0.5f);
+        AudioManager.Instance.PlayColoringWrongAnswer();
+        yield return new WaitForSeconds(0.5f);
+        AudioManager.Instance.PlayColorAppearSound();
+        yield return new WaitForSeconds(0.5f);
+        AudioManager.Instance.PlayStarAppearSound();
+        yield return new WaitForSeconds(0.5f);
+        AudioManager.Instance.PlaySFX("DrawingComplete");
+    }
+
+    // Метод для получения текущего прогресса (может пригодиться для UI)
+    public string GetCurrentProgress()
+    {
+        return $"Вопрос {currentQuestion + 1}/{currentDifficultySettings.totalQuestions} | Ошибки: {errorCount}/{maxErrors}";
+    }
+
+    // Метод для получения рекомендаций по слабым числам
+    public string GetWeakNumbersRecommendation()
+    {
+        int[] weakNumbers = adaptiveDifficulty.GetWeakNumbers();
+        if (weakNumbers.Length > 0)
+        {
+            return $"Слабые числа: {string.Join(", ", weakNumbers.Take(3))}";
+        }
+        return "Все числа освоены хорошо!";
     }
 }
