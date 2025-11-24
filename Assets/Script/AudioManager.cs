@@ -152,7 +152,6 @@ public class AudioManager : MonoBehaviour
             case "Woman":
                 PlayColoringMapMusic();
                 break;
-            case "BattleLevel":
             case "BattleLevel1":
             case "BattleLevel2":
             case "BattleLevel3":
@@ -163,15 +162,14 @@ public class AudioManager : MonoBehaviour
             case "BattleLevel8":
                 PlayBattleGameMusic();
                 break;
-            case "ColoringLevel":
-            case "ColoringLevel1":
-            case "ColoringLevel2":
-            case "ColoringLevel3":
-            case "ColoringLevel4":
-            case "ColoringLevel5":
-            case "ColoringLevel6":
-            case "ColoringLevel7":
-            case "ColoringLevel8":
+            case "Coloring_Level_1":
+            case "Coloring_Level_2":
+            case "Coloring_Level_3":
+            case "Coloring_Level_4":
+            case "Coloring_Level_5":
+            case "Coloring_Level_6":
+            case "Coloring_Level_7":
+            case "Coloring_Level_8":
                 PlayColoringGameMusic();
                 break;
             default:
@@ -190,7 +188,6 @@ public class AudioManager : MonoBehaviour
             case "Tutorial": return "Tutorial";
             case "Man": return "BattleMap";
             case "Woman": return "ColoringMap";
-            case "BattleLevel":
             case "BattleLevel1":
             case "BattleLevel2":
             case "BattleLevel3":
@@ -200,15 +197,14 @@ public class AudioManager : MonoBehaviour
             case "BattleLevel7":
             case "BattleLevel8":
                 return "BattleGame";
-            case "ColoringLevel":
-            case "ColoringLevel1":
-            case "ColoringLevel2":
-            case "ColoringLevel3":
-            case "ColoringLevel4":
-            case "ColoringLevel5":
-            case "ColoringLevel6":
-            case "ColoringLevel7":
-            case "ColoringLevel8":
+            case "Coloring_Level_1":
+            case "Coloring_Level_2":
+            case "Coloring_Level_3":
+            case "Coloring_Level_4":
+            case "Coloring_Level_5":
+            case "Coloring_Level_6":
+            case "Coloring_Level_7":
+            case "Coloring_Level_8":
                 return "ColoringGame";
             default: return "MainMenu";
         }

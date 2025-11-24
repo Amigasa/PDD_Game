@@ -2145,13 +2145,13 @@ MonoBehaviour:
   battleMapMusic: {fileID: 8300000, guid: 97969cb344fa6ba46acd57f1027f666d, type: 3}
   coloringMapMusic: {fileID: 8300000, guid: 97969cb344fa6ba46acd57f1027f666d, type: 3}
   battleGameMusic: {fileID: 8300000, guid: 45916ee3e0007db4f9aed2168d8ca941, type: 3}
-  coloringGameMusic: {fileID: 0}
-  victoryMusic: {fileID: 0}
-  defeatMusic: {fileID: 0}
+  coloringGameMusic: {fileID: 8300000, guid: eea827c1be8c04048a21a4888ac500ad, type: 3}
+  victoryMusic: {fileID: 8300000, guid: 00104d900b4b3694c8ee4ea5f369407e, type: 3}
+  defeatMusic: {fileID: 8300000, guid: 8a416e8356a8d4a45923606620e67317, type: 3}
   buttonClick: {fileID: 8300000, guid: 5dbd114886a39c04189a47ec1302e2d3, type: 3}
   buttonHover: {fileID: 0}
-  panelOpen: {fileID: 0}
-  panelClose: {fileID: 0}
+  panelOpen: {fileID: 8300000, guid: 97f97cd9942358847af7802453f07741, type: 3}
+  panelClose: {fileID: 8300000, guid: 51c3c310ce65baf498d364da115124a7, type: 3}
   battleCorrectAnswer: {fileID: 0}
   battleWrongAnswer: {fileID: 0}
   playerAttack: {fileID: 0}

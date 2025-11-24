@@ -266,19 +266,25 @@ public class ColoringController : MonoBehaviour
 
         currentQuestion++;
 
+        // Проверяем условия окончания игры
         if (errorCount >= maxErrors)
         {
             Defeat();
         }
         else if (currentQuestion >= currentDifficultySettings.totalQuestions)
         {
+            // Определяем результат на основе количества ошибок
             if (errorCount == 0)
             {
-                Victory(true);
+                Victory(true); // Идеально - 0 ошибок
+            }
+            else if (errorCount <= 2)
+            {
+                Victory(false); // Неплохо - 1-2 ошибки
             }
             else
             {
-                Victory(false);
+                Defeat(); // Поражение - 3-4 ошибки
             }
         }
         else
@@ -358,21 +364,15 @@ public class ColoringController : MonoBehaviour
             }
         }
 
-        bool isHighLevel = currentDifficultyLevel >= 5;
-        bool isExpertLevel = currentDifficultyLevel >= 7;
-
         if (isPerfect)
         {
             UnlockGalleryImage();
-
             victoryText.text = "Идеально! \nРисунок добавлен в галерею!";
         }
         else
         {
-            string adaptiveInfo = "";
-            int[] weakNumbers = adaptiveDifficulty.GetWeakNumbers();
-
-            victoryText.text = $"Неплохо! Правильных ответов: {correctAnswers}/{currentDifficultySettings.totalQuestions}{adaptiveInfo}";
+            // 1-2 ошибки
+            victoryText.text = $"Неплохо!\nПравильных ответов: {correctAnswers}/{currentDifficultySettings.totalQuestions}";
         }
 
         victoryPanel.SetActive(true);
@@ -393,12 +393,16 @@ public class ColoringController : MonoBehaviour
         TMP_Text defeatText = defeatPanel.GetComponentInChildren<TMP_Text>();
         if (defeatText != null)
         {
-            string adaptiveInfo = "";
-            int[] weakNumbers = adaptiveDifficulty.GetWeakNumbers();
-
-            defeatText.text = errorCount >= maxErrors ?
-                $"Слишком много ошибок!\nПопробуй еще раз!{adaptiveInfo}" :
-                $"Почти получилось!\nПравильных ответов: {correctAnswers}/{currentDifficultySettings.totalQuestions}{adaptiveInfo}";
+            if (errorCount >= maxErrors)
+            {
+                // Слишком много ошибок (maxErrors и больше)
+                defeatText.text = "Слишком много ошибок!\nПопробуй еще раз!";
+            }
+            else
+            {
+                // 3-4 ошибки
+                defeatText.text = $"Почти получилось!\nПравильных ответов: {correctAnswers}/{currentDifficultySettings.totalQuestions}";
+            }
         }
 
         defeatPanel.SetActive(true);

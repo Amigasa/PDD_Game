@@ -1591,10 +1591,10 @@ MonoBehaviour:
   coloringGameMusic: {fileID: 0}
   victoryMusic: {fileID: 0}
   defeatMusic: {fileID: 0}
-  buttonClick: {fileID: 8300000, guid: 5dbd114886a39c04189a47ec1302e2d3, type: 3}
+  buttonClick: {fileID: 8300000, guid: 41e3649aa56964346ab2a48e59efedfd, type: 3}
   buttonHover: {fileID: 0}
-  panelOpen: {fileID: 0}
-  panelClose: {fileID: 0}
+  panelOpen: {fileID: 8300000, guid: a9423a4728fe55342807ff4df08cb831, type: 3}
+  panelClose: {fileID: 8300000, guid: fbc5ca5fbd9a24e499592df61009f04e, type: 3}
   battleCorrectAnswer: {fileID: 0}
   battleWrongAnswer: {fileID: 0}
   playerAttack: {fileID: 0}
