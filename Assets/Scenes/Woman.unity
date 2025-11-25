@@ -621,7 +621,7 @@ MonoBehaviour:
     levelText: {fileID: 73404945}
     lockIcon: {fileID: 2031149173}
   - levelId: Coloring_Level_3
-    sceneBuildIndex: 14
+    sceneBuildIndex: 15
     levelButton: {fileID: 1785391032}
     stars:
     - {fileID: 1170096755}
@@ -630,7 +630,7 @@ MonoBehaviour:
     levelText: {fileID: 2015167897}
     lockIcon: {fileID: 1108634130}
   - levelId: Coloring_Level_4
-    sceneBuildIndex: 15
+    sceneBuildIndex: 16
     levelButton: {fileID: 2046635524}
     stars:
     - {fileID: 1657810001}
@@ -639,7 +639,7 @@ MonoBehaviour:
     levelText: {fileID: 1887685882}
     lockIcon: {fileID: 504478199}
   - levelId: Coloring_Level_5
-    sceneBuildIndex: 16
+    sceneBuildIndex: 17
     levelButton: {fileID: 270551228}
     stars:
     - {fileID: 759514061}
@@ -648,7 +648,7 @@ MonoBehaviour:
     levelText: {fileID: 1888370161}
     lockIcon: {fileID: 204074470}
   - levelId: Coloring_Level_6
-    sceneBuildIndex: 17
+    sceneBuildIndex: 18
     levelButton: {fileID: 1239942115}
     stars:
     - {fileID: 1729431226}
@@ -657,7 +657,7 @@ MonoBehaviour:
     levelText: {fileID: 514841989}
     lockIcon: {fileID: 643018117}
   - levelId: Coloring_Level_7
-    sceneBuildIndex: 18
+    sceneBuildIndex: 19
     levelButton: {fileID: 1227173219}
     stars:
     - {fileID: 1520464330}
@@ -666,7 +666,7 @@ MonoBehaviour:
     levelText: {fileID: 1348280397}
     lockIcon: {fileID: 2081687987}
   - levelId: Coloring_Level_8
-    sceneBuildIndex: 19
+    sceneBuildIndex: 20
     levelButton: {fileID: 192646508}
     stars:
     - {fileID: 1311209562}

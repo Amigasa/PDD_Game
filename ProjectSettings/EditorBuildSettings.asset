@@ -50,9 +50,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Tutorial.unity
     guid: eacccca1cb284b546885f5211755559a
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Color/Coloring_Level_3.unity
-    guid: 8cc5ff5b9f0caa44aa2ed67c343c2c3f
+    guid: 0e6b06f1603ac6f4ebca80f3e0ce7357
   - enabled: 0
     path: Assets/Scenes/Color/Coloring_Level_4.unity
     guid: 94a8f91efdc585f4ea8af48585fbdad1
