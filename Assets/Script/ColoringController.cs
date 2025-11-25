@@ -38,6 +38,10 @@ public class ColoringController : MonoBehaviour
     private AdaptiveDifficulty adaptiveDifficulty = new AdaptiveDifficulty();
     private DifficultySettings currentDifficultySettings;
 
+    // ЗАЩИТА ОТ ЗАВИСАНИЙ
+    private bool isProcessingAnswer = false;
+    private Coroutine currentAnimationCoroutine;
+
     void Start()
     {
         if (string.IsNullOrEmpty(levelId))
@@ -52,7 +56,7 @@ public class ColoringController : MonoBehaviour
         currentDifficultyLevel = progressiveLevelManager.ExtractLevelNumber(levelId) - 1;
 
         // Воспроизводим музыку для режима раскраски
-        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
+        if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlayColoringGameMusic();
         }
@@ -162,6 +166,7 @@ public class ColoringController : MonoBehaviour
     {
         int wrongAnswer;
         int attempts = 0;
+        int maxAttempts = 15; // ЗАЩИТА ОТ БЕСКОНЕЧНОГО ЦИКЛА
 
         do
         {
@@ -180,9 +185,11 @@ public class ColoringController : MonoBehaviour
 
             attempts++;
 
-            if (attempts > 20)
+            if (attempts > maxAttempts)
             {
+                // АВАРИЙНЫЙ ВЫХОД ИЗ ЦИКЛА
                 wrongAnswer = correctAnswer + (currentIndex + 1) * (currentIndex % 2 == 0 ? 1 : -1);
+                Debug.LogWarning($"Превышено количество попыток генерации неправильного ответа. Использовано аварийное значение: {wrongAnswer}");
                 break;
             }
 
@@ -208,9 +215,17 @@ public class ColoringController : MonoBehaviour
                 string correctStr = correctAnswer.ToString();
                 if (correctStr.Length == 2)
                 {
-                    char[] chars = correctStr.ToCharArray();
-                    System.Array.Reverse(chars);
-                    return int.Parse(new string(chars));
+                    try
+                    {
+                        char[] chars = correctStr.ToCharArray();
+                        System.Array.Reverse(chars);
+                        return int.Parse(new string(chars));
+                    }
+                    catch
+                    {
+                        // Если что-то пошло не так, используем fallback
+                        return correctAnswer + 1;
+                    }
                 }
                 break;
 
@@ -228,69 +243,88 @@ public class ColoringController : MonoBehaviour
 
     public void OnAnswerSelected(int buttonIndex, int selectedAnswer)
     {
-        if (!isGameActive) return;
+        // ЗАЩИТА ОТ МНОЖЕСТВЕННЫХ НАЖАТИЙ
+        if (!isGameActive || isProcessingAnswer) return;
+
+        isProcessingAnswer = true;
+
+        // ОСТАНАВЛИВАЕМ ПРЕДЫДУЩУЮ АНИМАЦИЮ
+        if (currentAnimationCoroutine != null)
+        {
+            StopCoroutine(currentAnimationCoroutine);
+        }
 
         if (selectedAnswer == correctAnswer)
         {
             // Звуки правильного ответа
-            if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
+            if (AudioManager.Instance != null)
             {
-                AudioManager.Instance.PlayColoringCorrectAnswer();
-                AudioManager.Instance.PlayColorAppearSound();
+                AudioManager.Instance.PlaySFX("ColoringCorrectAnswer");
+                AudioManager.Instance.PlaySFX("ColorAppear");
             }
 
             correctAnswers++;
-            ShowPart(currentQuestion, true);
+            currentAnimationCoroutine = StartCoroutine(ShowPartWithAnimation(currentQuestion, true));
         }
         else
         {
             // Звуки неправильного ответа
-            if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
+            if (AudioManager.Instance != null)
             {
-                AudioManager.Instance.PlayColoringWrongAnswer();
+                AudioManager.Instance.PlaySFX("ColoringWrongAnswer");
             }
 
             errorCount++;
 
-            // Записываем ошибку в адаптивную систему
-            string[] numbers = questionText.text.Split('×');
-            if (numbers.Length == 2)
+            // ЗАЩИЩЕННЫЙ ПАРСИНГ ВОПРОСА
+            if (TryParseQuestion(questionText.text, out int num1, out int num2))
             {
-                int num1 = int.Parse(numbers[0].Trim());
-                int num2 = int.Parse(numbers[1].Split('=')[0].Trim());
                 adaptiveDifficulty.RecordMistake(num1, num2);
             }
 
-            ShowPart(currentQuestion, false);
+            currentAnimationCoroutine = StartCoroutine(ShowPartWithAnimation(currentQuestion, false));
         }
 
         currentQuestion++;
 
-        // Проверяем условия окончания игры
-        if (errorCount >= maxErrors)
+        // ПРОВЕРЯЕМ УСЛОВИЯ ОКОНЧАНИЯ ИГРЫ С ЗАДЕРЖКОЙ
+        StartCoroutine(CheckGameEndWithDelay());
+    }
+
+    // ЗАЩИЩЕННЫЙ ПАРСИНГ ВОПРОСА
+    private bool TryParseQuestion(string questionText, out int num1, out int num2)
+    {
+        num1 = 0;
+        num2 = 0;
+
+        try
         {
-            Defeat();
+            string[] parts = questionText.Split('×');
+            if (parts.Length != 2) return false;
+
+            string[] secondPart = parts[1].Split('=');
+            if (secondPart.Length == 0) return false;
+
+            if (!int.TryParse(parts[0].Trim(), out num1)) return false;
+            if (!int.TryParse(secondPart[0].Trim(), out num2)) return false;
+
+            return true;
         }
-        else if (currentQuestion >= currentDifficultySettings.totalQuestions)
+        catch (System.Exception e)
         {
-            // Определяем результат на основе количества ошибок
-            if (errorCount == 0)
-            {
-                Victory(true); // Идеально - 0 ошибок
-            }
-            else if (errorCount <= 2)
-            {
-                Victory(false); // Неплохо - 1-2 ошибки
-            }
-            else
-            {
-                Defeat(); // Поражение - 3-4 ошибки
-            }
+            Debug.LogError($"Ошибка парсинга вопроса: {e.Message}");
+            return false;
         }
-        else
-        {
-            GenerateQuestion();
-        }
+    }
+
+    IEnumerator ShowPartWithAnimation(int partIndex, bool isCorrect)
+    {
+        ShowPart(partIndex, isCorrect);
+
+        // ЖДЕМ ЗАВЕРШЕНИЯ АНИМАЦИИ ПЕРЕД РАЗБЛОКИРОВКОЙ
+        yield return new WaitForSeconds(0.6f);
+
+        isProcessingAnswer = false;
     }
 
     void ShowPart(int partIndex, bool isCorrect)
@@ -322,7 +356,7 @@ public class ColoringController : MonoBehaviour
 
     IEnumerator AnimateAppearance(GameObject part)
     {
-        if (part == null) yield break;
+        if (part == null || !isGameActive) yield break;
 
         Image partImage = part.GetComponent<Image>();
         if (partImage != null)
@@ -334,25 +368,61 @@ public class ColoringController : MonoBehaviour
 
             partImage.color = transparentColor;
 
-            while (elapsed < duration)
+            while (elapsed < duration && isGameActive) // ЗАЩИТА
             {
                 partImage.color = Color.Lerp(transparentColor, originalColor, elapsed / duration);
                 elapsed += Time.deltaTime;
                 yield return null;
             }
 
-            partImage.color = originalColor;
+            if (isGameActive) // ЗАЩИТА
+            {
+                partImage.color = originalColor;
+            }
+        }
+    }
+
+    IEnumerator CheckGameEndWithDelay()
+    {
+        // КОРОТКАЯ ЗАДЕРЖКА ПЕРЕД ПРОВЕРКОЙ КОНЦА ИГРЫ
+        yield return new WaitForSeconds(0.3f);
+
+        if (errorCount >= maxErrors)
+        {
+            Defeat();
+        }
+        else if (currentQuestion >= currentDifficultySettings.totalQuestions)
+        {
+            // Определяем результат на основе количества ошибок
+            if (errorCount == 0)
+            {
+                Victory(true); // Идеально - 0 ошибок
+            }
+            else if (errorCount <= 2)
+            {
+                Victory(false); // Неплохо - 1-2 ошибки
+            }
+            else
+            {
+                Defeat(); // Поражение - 3-4 ошибки
+            }
+        }
+        else
+        {
+            GenerateQuestion();
         }
     }
 
     void Victory(bool isPerfect)
     {
+        if (!isGameActive) return; // ЗАЩИТА ОТ ПОВТОРНЫХ ВЫЗОВОВ
+
         isGameActive = false;
 
         SaveLevelProgress(isPerfect);
 
         // Звуки победы
-        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
+        if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlayVictoryMusic();
             AudioManager.Instance.PlaySFX("DrawingComplete");
@@ -360,41 +430,34 @@ public class ColoringController : MonoBehaviour
             // Дополнительный звук для идеального результата
             if (isPerfect)
             {
-                AudioManager.Instance.PlayStarAppearSound();
+                AudioManager.Instance.PlaySFX("StarAppear");
             }
         }
 
         if (isPerfect)
         {
             UnlockGalleryImage();
-            victoryText.text = "Идеально! \nРисунок добавлен в галерею! 🎨";
+            victoryText.text = "Идеально! \nРисунок добавлен в галерею!";
         }
         else
         {
             // 1-2 ошибки
             victoryText.text = $"Неплохо!\nПравильных ответов: {correctAnswers}/{currentDifficultySettings.totalQuestions}";
-
-            // Добавляем рекомендации по слабым числам
-            int[] weakNumbers = adaptiveDifficulty.GetWeakNumbers();
-            if (weakNumbers.Length > 0)
-            {
-                victoryText.text += $"\nПовтори: {string.Join(", ", weakNumbers.Take(2))}";
-            }
         }
-
-        victoryText.text += $"\nУровень сложности: {currentDifficultyLevel + 1}";
 
         victoryPanel.SetActive(true);
     }
 
     void Defeat()
     {
+        if (!isGameActive) return; // ЗАЩИТА ОТ ПОВТОРНЫХ ВЫЗОВОВ
+
         isGameActive = false;
 
         SaveLevelProgress(false);
 
         // Звуки поражения
-        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
+        if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlayDefeatMusic();
         }
@@ -402,99 +465,104 @@ public class ColoringController : MonoBehaviour
         TMP_Text defeatText = defeatPanel.GetComponentInChildren<TMP_Text>();
         if (defeatText != null)
         {
-            string adaptiveInfo = "";
-            int[] weakNumbers = adaptiveDifficulty.GetWeakNumbers();
-            if (weakNumbers.Length > 0)
-            {
-                adaptiveInfo = $"\nСлабые числа: {string.Join(", ", weakNumbers.Take(2))}";
-            }
-
             if (errorCount >= maxErrors)
             {
                 // Слишком много ошибок (maxErrors и больше)
-                defeatText.text = $"Слишком много ошибок!\nПопробуй еще раз!{adaptiveInfo}";
+                defeatText.text = "Слишком много ошибок!\nПопробуй еще раз!";
             }
             else
             {
                 // 3-4 ошибки
-                defeatText.text = $"Почти получилось!\nПравильных ответов: {correctAnswers}/{currentDifficultySettings.totalQuestions}{adaptiveInfo}";
+                defeatText.text = $"Почти получилось!\nПравильных ответов: {correctAnswers}/{currentDifficultySettings.totalQuestions}";
             }
         }
-
-        defeatText.text += $"\nУровень сложности: {currentDifficultyLevel + 1}";
 
         defeatPanel.SetActive(true);
     }
 
     void SaveLevelProgress(bool isPerfect)
     {
-        int currentSlot = PlayerPrefs.GetInt("CurrentSaveSlot", 0);
-
-        // Сохраняем что уровень пройден
-        string completedKey = $"Slot_{currentSlot}_{levelId}_completed";
-        PlayerPrefs.SetInt(completedKey, 1);
-
-        // Расчет звезд
-        int baseStars = isPerfect ? 3 : (correctAnswers >= currentDifficultySettings.totalQuestions * 0.7f ? 2 : 1);
-
-        // Бонус за высокий уровень сложности
-        int difficultyBonus = (currentDifficultyLevel >= 5 && correctAnswers >= currentDifficultySettings.totalQuestions * 0.8f) ? 1 : 0;
-        int totalStars = Mathf.Min(3, baseStars + difficultyBonus);
-
-        string starsKey = $"Slot_{currentSlot}_{levelId}_stars";
-        PlayerPrefs.SetInt(starsKey, totalStars);
-
-        // Сохраняем максимальный достигнутый уровень сложности
-        string maxDifficultyKey = $"Slot_{currentSlot}_{levelId}_maxLevel";
-        int currentMax = PlayerPrefs.GetInt(maxDifficultyKey, 0);
-        if (currentDifficultyLevel > currentMax)
+        try
         {
-            PlayerPrefs.SetInt(maxDifficultyKey, currentDifficultyLevel);
+            int currentSlot = PlayerPrefs.GetInt("CurrentSaveSlot", 0);
+
+            // Сохраняем что уровень пройден
+            string completedKey = $"Slot_{currentSlot}_{levelId}_completed";
+            PlayerPrefs.SetInt(completedKey, 1);
+
+            // Расчет звезд
+            int baseStars = isPerfect ? 3 : (correctAnswers >= currentDifficultySettings.totalQuestions * 0.7f ? 2 : 1);
+
+            // Бонус за высокий уровень сложности
+            int difficultyBonus = (currentDifficultyLevel >= 5 && correctAnswers >= currentDifficultySettings.totalQuestions * 0.8f) ? 1 : 0;
+            int totalStars = Mathf.Min(3, baseStars + difficultyBonus);
+
+            string starsKey = $"Slot_{currentSlot}_{levelId}_stars";
+            PlayerPrefs.SetInt(starsKey, totalStars);
+
+            PlayerPrefs.Save();
+
+            Debug.Log($"Сохранен прогресс: {levelId}, Звезд: {totalStars}, Уровень: {currentDifficultyLevel + 1}, Идеально: {isPerfect}");
         }
-
-        PlayerPrefs.Save();
-
-        Debug.Log($"Сохранен прогресс: {levelId}, Звезд: {totalStars}, Уровень: {currentDifficultyLevel + 1}, Идеально: {isPerfect}");
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Ошибка сохранения прогресса: {e.Message}");
+        }
     }
 
     void UnlockGalleryImage()
     {
-        int currentSlot = PlayerPrefs.GetInt("CurrentSaveSlot", 0);
+        try
+        {
+            int currentSlot = PlayerPrefs.GetInt("CurrentSaveSlot", 0);
 
-        int levelNumber = progressiveLevelManager.ExtractLevelNumber(levelId);
+            int levelNumber = progressiveLevelManager.ExtractLevelNumber(levelId);
 
-        string galleryKey = $"Slot_{currentSlot}_Gallery_Level_{levelNumber}";
-        PlayerPrefs.SetInt(galleryKey, 1);
-        PlayerPrefs.Save();
+            string galleryKey = $"Slot_{currentSlot}_Gallery_Level_{levelNumber}";
+            PlayerPrefs.SetInt(galleryKey, 1);
+            PlayerPrefs.Save();
 
-        Debug.Log($"Рисунок уровня {levelNumber} разблокирован в галерее слота {currentSlot}!");
+            Debug.Log($"Рисунок уровня {levelNumber} разблокирован в галерее слота {currentSlot}!");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Ошибка разблокировки галереи: {e.Message}");
+        }
     }
 
     // Кнопки UI
     public void RestartLevel()
     {
         // Звук кнопки перезапуска
-        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
+        if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlayButtonClick();
         }
+
+        // ОСТАНАВЛИВАЕМ ВСЕ КОРУТИНЫ
+        StopAllCoroutines();
+
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void BackToMenu()
     {
         // Звук кнопки возврата
-        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
+        if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlayButtonClick();
         }
+
+        // ОСТАНАВЛИВАЕМ ВСЕ КОРУТИНЫ
+        StopAllCoroutines();
+
         SceneManager.LoadScene(2);
     }
 
     public void LoadNextLevel()
     {
         // Звук кнопки следующего уровня
-        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
+        if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlayButtonClick();
         }
@@ -507,6 +575,8 @@ public class ColoringController : MonoBehaviour
             string nextSceneName = $"ColoringLevel{nextLevel}";
             if (Application.CanStreamedLevelBeLoaded(nextSceneName))
             {
+                // ОСТАНАВЛИВАЕМ ВСЕ КОРУТИНЫ
+                StopAllCoroutines();
                 SceneManager.LoadScene(nextSceneName);
             }
             else
@@ -523,7 +593,7 @@ public class ColoringController : MonoBehaviour
     // Дополнительные методы для управления звуками
     public void PlayButtonSound()
     {
-        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
+        if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlayButtonClick();
         }
@@ -531,48 +601,15 @@ public class ColoringController : MonoBehaviour
 
     public void PlayHoverSound()
     {
-        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
+        if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlayButtonHover();
         }
     }
 
-    // Метод для отладки звуков (можно удалить в финальной версии)
-    public void TestColoringSounds()
+    void OnDestroy()
     {
-        if (AudioManager.Instance != null && AudioManager.Instance.IsAudioSupported())
-        {
-            StartCoroutine(TestSoundsCoroutine());
-        }
-    }
-
-    private IEnumerator TestSoundsCoroutine()
-    {
-        AudioManager.Instance.PlayColoringCorrectAnswer();
-        yield return new WaitForSeconds(0.5f);
-        AudioManager.Instance.PlayColoringWrongAnswer();
-        yield return new WaitForSeconds(0.5f);
-        AudioManager.Instance.PlayColorAppearSound();
-        yield return new WaitForSeconds(0.5f);
-        AudioManager.Instance.PlayStarAppearSound();
-        yield return new WaitForSeconds(0.5f);
-        AudioManager.Instance.PlaySFX("DrawingComplete");
-    }
-
-    // Метод для получения текущего прогресса (может пригодиться для UI)
-    public string GetCurrentProgress()
-    {
-        return $"Вопрос {currentQuestion + 1}/{currentDifficultySettings.totalQuestions} | Ошибки: {errorCount}/{maxErrors}";
-    }
-
-    // Метод для получения рекомендаций по слабым числам
-    public string GetWeakNumbersRecommendation()
-    {
-        int[] weakNumbers = adaptiveDifficulty.GetWeakNumbers();
-        if (weakNumbers.Length > 0)
-        {
-            return $"Слабые числа: {string.Join(", ", weakNumbers.Take(3))}";
-        }
-        return "Все числа освоены хорошо!";
+        // ОЧИСТКА РЕСУРСОВ ПРИ ВЫГРУЗКЕ
+        StopAllCoroutines();
     }
 }

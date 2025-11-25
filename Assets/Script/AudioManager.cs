@@ -1,4 +1,4 @@
-using UnityEngine;
+п»їusing UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
@@ -7,12 +7,12 @@ public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance;
 
-    [Header("Источники звука")]
+    [Header("РСЃС‚РѕС‡РЅРёРєРё Р·РІСѓРєР°")]
     public AudioSource musicSource;
     public AudioSource sfxSource;
     public AudioSource uiSource;
 
-    [Header("Фоновая музыка")]
+    [Header("Р¤РѕРЅРѕРІР°СЏ РјСѓР·С‹РєР°")]
     public AudioClip mainMenuMusic;
     public AudioClip galleryMusic;
     public AudioClip tutorialMusic;
@@ -23,13 +23,13 @@ public class AudioManager : MonoBehaviour
     public AudioClip victoryMusic;
     public AudioClip defeatMusic;
 
-    [Header("Звуки UI")]
+    [Header("Р—РІСѓРєРё UI")]
     public AudioClip buttonClick;
     public AudioClip buttonHover;
     public AudioClip panelOpen;
     public AudioClip panelClose;
 
-    [Header("Звуки игры - Битва")]
+    [Header("Р—РІСѓРєРё РёРіСЂС‹ - Р‘РёС‚РІР°")]
     public AudioClip battleCorrectAnswer;
     public AudioClip battleWrongAnswer;
     public AudioClip playerAttack;
@@ -39,20 +39,19 @@ public class AudioManager : MonoBehaviour
     public AudioClip starAppear;
     public AudioClip levelComplete;
 
-    [Header("Звуки игры - Разукрашка")]
+    [Header("Р—РІСѓРєРё РёРіСЂС‹ - Р Р°Р·СѓРєСЂР°С€РєР°")]
     public AudioClip coloringCorrectAnswer;
     public AudioClip coloringWrongAnswer;
     public AudioClip colorAppear;
     public AudioClip drawingComplete;
 
-    [Header("Настройки")]
+    [Header("РќР°СЃС‚СЂРѕР№РєРё")]
     public float musicVolume = 0.7f;
     public float sfxVolume = 1.0f;
     public float uiVolume = 1.0f;
 
     private Dictionary<string, AudioClip> soundDictionary = new Dictionary<string, AudioClip>();
     private string currentMusic = "";
-    private bool audioInitialized = false;
 
     void Awake()
     {
@@ -60,7 +59,6 @@ public class AudioManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            InitializeAudioSystem();
             InitializeSoundDictionary();
         }
         else
@@ -71,71 +69,19 @@ public class AudioManager : MonoBehaviour
 
     void Start()
     {
-        // Загружаем настройки громкости
+        // Р—Р°РіСЂСѓР¶Р°РµРј РЅР°СЃС‚СЂРѕР№РєРё РіСЂРѕРјРєРѕСЃС‚Рё
         LoadAudioSettings();
 
-        // Автоматически включаем музыку для текущей сцены
+        // РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРё РІРєР»СЋС‡Р°РµРј РјСѓР·С‹РєСѓ РґР»СЏ С‚РµРєСѓС‰РµР№ СЃС†РµРЅС‹
         PlayMusicForScene(SceneManager.GetActiveScene().name);
 
-        // Следим за сменой сцен
+        // РЎР»РµРґРёРј Р·Р° СЃРјРµРЅРѕР№ СЃС†РµРЅ
         SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-
-    void InitializeAudioSystem()
-    {
-        // Создаем AudioSource если их нет
-        if (musicSource == null)
-            musicSource = gameObject.AddComponent<AudioSource>();
-        if (sfxSource == null)
-            sfxSource = gameObject.AddComponent<AudioSource>();
-        if (uiSource == null)
-            uiSource = gameObject.AddComponent<AudioSource>();
-
-        // Настраиваем AudioSource для мобильных устройств
-        ConfigureAudioSource(musicSource, true, "Music");
-        ConfigureAudioSource(sfxSource, false, "SFX");
-        ConfigureAudioSource(uiSource, false, "UI");
-
-        // Проверяем поддержку аудио
-        if (!SystemInfo.supportsAudio)
-        {
-            Debug.LogWarning("AudioManager: Audio is not supported on this device!");
-        }
-        else
-        {
-            Debug.Log("AudioManager: Audio system initialized successfully");
-            audioInitialized = true;
-        }
-    }
-
-    void ConfigureAudioSource(AudioSource source, bool isMusic, string sourceName)
-    {
-        source.playOnAwake = false;
-        source.spatialBlend = 0f; // 2D звук
-        source.loop = isMusic;
-
-        // Настройки для мобильной оптимизации
-        source.bypassEffects = true;
-        source.bypassListenerEffects = true;
-        source.bypassReverbZones = true;
-
-        if (isMusic)
-        {
-            source.volume = musicVolume;
-            source.priority = 0; // Высокий приоритет для музыки
-        }
-        else
-        {
-            source.volume = sfxVolume;
-            source.priority = 128; // Средний приоритет для SFX
-        }
-
-        Debug.Log($"AudioManager: Configured {sourceName} source - Loop: {isMusic}, Volume: {source.volume}");
     }
 
     void InitializeSoundDictionary()
     {
-        // Музыка
+        // РњСѓР·С‹РєР°
         soundDictionary["MainMenuMusic"] = mainMenuMusic;
         soundDictionary["GalleryMusic"] = galleryMusic;
         soundDictionary["TutorialMusic"] = tutorialMusic;
@@ -146,13 +92,13 @@ public class AudioManager : MonoBehaviour
         soundDictionary["VictoryMusic"] = victoryMusic;
         soundDictionary["DefeatMusic"] = defeatMusic;
 
-        // UI звуки
+        // UI Р·РІСѓРєРё
         soundDictionary["ButtonClick"] = buttonClick;
         soundDictionary["ButtonHover"] = buttonHover;
         soundDictionary["PanelOpen"] = panelOpen;
         soundDictionary["PanelClose"] = panelClose;
 
-        // Битва
+        // Р‘РёС‚РІР°
         soundDictionary["BattleCorrectAnswer"] = battleCorrectAnswer;
         soundDictionary["BattleWrongAnswer"] = battleWrongAnswer;
         soundDictionary["PlayerAttack"] = playerAttack;
@@ -162,35 +108,31 @@ public class AudioManager : MonoBehaviour
         soundDictionary["StarAppear"] = starAppear;
         soundDictionary["LevelComplete"] = levelComplete;
 
-        // Разукрашка
+        // Р Р°Р·СѓРєСЂР°С€РєР°
         soundDictionary["ColoringCorrectAnswer"] = coloringCorrectAnswer;
         soundDictionary["ColoringWrongAnswer"] = coloringWrongAnswer;
         soundDictionary["ColorAppear"] = colorAppear;
         soundDictionary["DrawingComplete"] = drawingComplete;
-
-        Debug.Log($"AudioManager: Sound dictionary initialized with {soundDictionary.Count} sounds");
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        Debug.Log($"AudioManager: Scene changed to {scene.name}");
+        Debug.Log($"AudioManager: РЎРјРµРЅР° СЃС†РµРЅС‹ РЅР° {scene.name}");
         PlayMusicForScene(scene.name);
     }
 
     public void PlayMusicForScene(string sceneName)
     {
-        if (!audioInitialized) return;
-
         string requiredMusic = GetMusicForScene(sceneName);
 
-        // Если уже играет нужная музыка - не переключаем
-        if (currentMusic == requiredMusic && musicSource.isPlaying)
+        // Р•СЃР»Рё СѓР¶Рµ РёРіСЂР°РµС‚ РЅСѓР¶РЅР°СЏ РјСѓР·С‹РєР° - РЅРµ РїРµСЂРµРєР»СЋС‡Р°РµРј
+        if (currentMusic == requiredMusic)
         {
-            Debug.Log($"AudioManager: Music already playing ({currentMusic})");
+            Debug.Log($"AudioManager: РњСѓР·С‹РєР° СѓР¶Рµ РёРіСЂР°РµС‚ ({currentMusic})");
             return;
         }
 
-        Debug.Log($"AudioManager: Switching music {currentMusic} -> {requiredMusic}");
+        Debug.Log($"AudioManager: РџРµСЂРµРєР»СЋС‡Р°СЋ РјСѓР·С‹РєСѓ {currentMusic} -> {requiredMusic}");
         currentMusic = requiredMusic;
 
         switch (sceneName)
@@ -220,14 +162,18 @@ public class AudioManager : MonoBehaviour
             case "BattleLevel8":
                 PlayBattleGameMusic();
                 break;
-            case "ColoringLevel1":
-            case "ColoringLevel2":
-            case "ColoringLevel3":
-            case "ColoringLevel4":
+            case "Coloring_Level_1":
+            case "Coloring_Level_2":
+            case "Coloring_Level_3":
+            case "Coloring_Level_4":
+            case "Coloring_Level_5":
+            case "Coloring_Level_6":
+            case "Coloring_Level_7":
+            case "Coloring_Level_8":
                 PlayColoringGameMusic();
                 break;
             default:
-                // Для любых других сцен используем музыку главного меню
+                // Р”Р»СЏ Р»СЋР±С‹С… РґСЂСѓРіРёС… СЃС†РµРЅ РёСЃРїРѕР»СЊР·СѓРµРј РјСѓР·С‹РєСѓ РіР»Р°РІРЅРѕРіРѕ РјРµРЅСЋ
                 PlayMainMenuMusic();
                 break;
         }
@@ -251,168 +197,147 @@ public class AudioManager : MonoBehaviour
             case "BattleLevel7":
             case "BattleLevel8":
                 return "BattleGame";
-            case "ColoringLevel1":
-            case "ColoringLevel2":
-            case "ColoringLevel3":
-            case "ColoringLevel4":
+            case "Coloring_Level_1":
+            case "Coloring_Level_2":
+            case "Coloring_Level_3":
+            case "Coloring_Level_4":
+            case "Coloring_Level_5":
+            case "Coloring_Level_6":
+            case "Coloring_Level_7":
+            case "Coloring_Level_8":
                 return "ColoringGame";
             default: return "MainMenu";
         }
     }
 
-    // === УПРАВЛЕНИЕ МУЗЫКОЙ ===
+    // === РЈРџР РђР’Р›Р•РќРР• РњРЈР—Р«РљРћР™ ===
     public void PlayMainMenuMusic()
     {
-        PlayMusic(mainMenuMusic, "Main Menu");
+        if (mainMenuMusic != null)
+        {
+            musicSource.clip = mainMenuMusic;
+            musicSource.volume = musicVolume;
+            musicSource.loop = true;
+            musicSource.Play();
+        }
     }
 
     public void PlayGalleryMusic()
     {
-        PlayMusic(galleryMusic, "Gallery");
+        if (galleryMusic != null)
+        {
+            musicSource.clip = galleryMusic;
+            musicSource.volume = musicVolume;
+            musicSource.loop = true;
+            musicSource.Play();
+        }
     }
 
     public void PlayTutorialMusic()
     {
-        PlayMusic(tutorialMusic, "Tutorial");
+        if (tutorialMusic != null)
+        {
+            musicSource.clip = tutorialMusic;
+            musicSource.volume = musicVolume;
+            musicSource.loop = true;
+            musicSource.Play();
+        }
     }
 
     public void PlayBattleMapMusic()
     {
-        PlayMusic(battleMapMusic, "Battle Map");
+        if (battleMapMusic != null)
+        {
+            musicSource.clip = battleMapMusic;
+            musicSource.volume = musicVolume;
+            musicSource.loop = true;
+            musicSource.Play();
+        }
     }
 
     public void PlayColoringMapMusic()
     {
-        PlayMusic(coloringMapMusic, "Coloring Map");
+        if (coloringMapMusic != null)
+        {
+            musicSource.clip = coloringMapMusic;
+            musicSource.volume = musicVolume;
+            musicSource.loop = true;
+            musicSource.Play();
+        }
     }
 
     public void PlayBattleGameMusic()
     {
-        PlayMusic(battleGameMusic, "Battle Game");
+        if (battleGameMusic != null)
+        {
+            musicSource.clip = battleGameMusic;
+            musicSource.volume = musicVolume;
+            musicSource.loop = true;
+            musicSource.Play();
+        }
     }
 
     public void PlayColoringGameMusic()
     {
-        PlayMusic(coloringGameMusic, "Coloring Game");
+        if (coloringGameMusic != null)
+        {
+            musicSource.clip = coloringGameMusic;
+            musicSource.volume = musicVolume;
+            musicSource.loop = true;
+            musicSource.Play();
+        }
     }
 
     public void PlayVictoryMusic()
     {
-        PlayMusic(victoryMusic, "Victory", false);
+        if (victoryMusic != null)
+        {
+            musicSource.clip = victoryMusic;
+            musicSource.volume = musicVolume;
+            musicSource.loop = false;
+            musicSource.Play();
+        }
     }
 
     public void PlayDefeatMusic()
     {
-        PlayMusic(defeatMusic, "Defeat", false);
-    }
-
-    private void PlayMusic(AudioClip clip, string musicName, bool loop = true)
-    {
-        if (!audioInitialized || clip == null) return;
-
-        musicSource.clip = clip;
-        musicSource.volume = musicVolume;
-        musicSource.loop = loop;
-        musicSource.Play();
-
-        Debug.Log($"AudioManager: Playing {musicName} music");
+        if (defeatMusic != null)
+        {
+            musicSource.clip = defeatMusic;
+            musicSource.volume = musicVolume;
+            musicSource.loop = false;
+            musicSource.Play();
+        }
     }
 
     public void StopMusic()
     {
-        if (musicSource.isPlaying)
-        {
-            musicSource.Stop();
-            Debug.Log("AudioManager: Music stopped");
-        }
+        musicSource.Stop();
     }
 
-    // === ЗВУКИ SFX ===
+    // === Р—Р’РЈРљР SFX ===
     public void PlaySFX(string soundName)
     {
-        if (!audioInitialized) return;
-
         if (soundDictionary.ContainsKey(soundName) && soundDictionary[soundName] != null)
         {
-            if (sfxSource != null && sfxSource.isActiveAndEnabled)
-            {
-                sfxSource.PlayOneShot(soundDictionary[soundName], sfxVolume);
-                Debug.Log($"AudioManager: Playing SFX - {soundName}");
-            }
-        }
-        else
-        {
-            Debug.LogWarning($"AudioManager: Sound '{soundName}' not found in dictionary!");
+            sfxSource.PlayOneShot(soundDictionary[soundName], sfxVolume);
         }
     }
 
     public void PlaySFX(AudioClip clip)
     {
-        if (!audioInitialized || clip == null) return;
-
-        if (sfxSource != null && sfxSource.isActiveAndEnabled)
+        if (clip != null)
         {
             sfxSource.PlayOneShot(clip, sfxVolume);
         }
     }
 
-    // === СПЕЦИАЛЬНЫЕ МЕТОДЫ ДЛЯ ИГРЫ ===
-    public void PlayBattleCorrectAnswer()
-    {
-        PlaySFX("BattleCorrectAnswer");
-    }
-
-    public void PlayBattleWrongAnswer()
-    {
-        PlaySFX("BattleWrongAnswer");
-    }
-
-    public void PlayColoringCorrectAnswer()
-    {
-        PlaySFX("ColoringCorrectAnswer");
-    }
-
-    public void PlayColoringWrongAnswer()
-    {
-        PlaySFX("ColoringWrongAnswer");
-    }
-
-    public void PlayVictorySound()
-    {
-        PlaySFX("LevelComplete");
-    }
-
-    public void PlayDefeatSound()
-    {
-        PlaySFX("PanelClose");
-    }
-
-    public void PlayButtonClickSound()
-    {
-        PlayUI("ButtonClick");
-    }
-
-    public void PlayColorAppearSound()
-    {
-        PlaySFX("ColorAppear");
-    }
-
-    public void PlayStarAppearSound()
-    {
-        PlaySFX("StarAppear");
-    }
-
-    // === ЗВУКИ UI ===
+    // === Р—Р’РЈРљР UI ===
     public void PlayUI(string soundName)
     {
-        if (!audioInitialized) return;
-
         if (soundDictionary.ContainsKey(soundName) && soundDictionary[soundName] != null)
         {
-            if (uiSource != null && uiSource.isActiveAndEnabled)
-            {
-                uiSource.PlayOneShot(soundDictionary[soundName], uiVolume);
-            }
+            uiSource.PlayOneShot(soundDictionary[soundName], uiVolume);
         }
     }
 
@@ -426,24 +351,23 @@ public class AudioManager : MonoBehaviour
         PlayUI("ButtonHover");
     }
 
-    // === НАСТРОЙКИ ГРОМКОСТИ ===
+    // === РќРђРЎРўР РћР™РљР Р“Р РћРњРљРћРЎРўР ===
     public void SetMusicVolume(float volume)
     {
-        musicVolume = Mathf.Clamp01(volume);
-        if (musicSource != null)
-            musicSource.volume = musicVolume;
+        musicVolume = volume;
+        musicSource.volume = volume;
         SaveAudioSettings();
     }
 
     public void SetSFXVolume(float volume)
     {
-        sfxVolume = Mathf.Clamp01(volume);
+        sfxVolume = volume;
         SaveAudioSettings();
     }
 
     public void SetUIVolume(float volume)
     {
-        uiVolume = Mathf.Clamp01(volume);
+        uiVolume = volume;
         SaveAudioSettings();
     }
 
@@ -453,8 +377,6 @@ public class AudioManager : MonoBehaviour
         PlayerPrefs.SetFloat("SFXVolume", sfxVolume);
         PlayerPrefs.SetFloat("UIVolume", uiVolume);
         PlayerPrefs.Save();
-
-        Debug.Log($"AudioManager: Settings saved - Music: {musicVolume}, SFX: {sfxVolume}, UI: {uiVolume}");
     }
 
     private void LoadAudioSettings()
@@ -463,49 +385,7 @@ public class AudioManager : MonoBehaviour
         sfxVolume = PlayerPrefs.GetFloat("SFXVolume", 1.0f);
         uiVolume = PlayerPrefs.GetFloat("UIVolume", 1.0f);
 
-        if (musicSource != null)
-            musicSource.volume = musicVolume;
-
-        Debug.Log($"AudioManager: Settings loaded - Music: {musicVolume}, SFX: {sfxVolume}, UI: {uiVolume}");
-    }
-
-    // === МЕТОДЫ ДЛЯ ТЕСТИРОВАНИЯ ===
-    public void TestAllSounds()
-    {
-        if (!audioInitialized) return;
-
-        Debug.Log("AudioManager: Testing all sounds...");
-        StartCoroutine(TestSoundSequence());
-    }
-
-    private IEnumerator TestSoundSequence()
-    {
-        PlayBattleCorrectAnswer();
-        yield return new WaitForSeconds(0.3f);
-        PlayBattleWrongAnswer();
-        yield return new WaitForSeconds(0.3f);
-        PlayColoringCorrectAnswer();
-        yield return new WaitForSeconds(0.3f);
-        PlayColoringWrongAnswer();
-        yield return new WaitForSeconds(0.3f);
-        PlayButtonClickSound();
-        yield return new WaitForSeconds(0.3f);
-        PlayColorAppearSound();
-        yield return new WaitForSeconds(0.3f);
-        PlayStarAppearSound();
-
-        Debug.Log("AudioManager: Sound test completed");
-    }
-
-    // === СТАТУС АУДИО СИСТЕМЫ ===
-    public bool IsAudioSupported()
-    {
-        return audioInitialized;
-    }
-
-    public string GetAudioStatus()
-    {
-        return audioInitialized ? "Audio system is working" : "Audio system is not supported";
+        musicSource.volume = musicVolume;
     }
 
     void OnDestroy()
