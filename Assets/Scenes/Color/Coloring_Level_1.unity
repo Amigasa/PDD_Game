@@ -3410,7 +3410,7 @@ MonoBehaviour:
   enemyDamage: {fileID: 8300000, guid: 2e49e32a30a77984a833df05f5c24acb, type: 3}
   starAppear: {fileID: 8300000, guid: ab77a87422540b44493f7d9311c0000a, type: 3}
   levelComplete: {fileID: 0}
-  coloringCorrectAnswer: {fileID: 8300000, guid: 97f97cd9942358847af7802453f07741, type: 3}
+  coloringCorrectAnswer: {fileID: 0}
   coloringWrongAnswer: {fileID: 8300000, guid: 51c3c310ce65baf498d364da115124a7, type: 3}
   colorAppear: {fileID: 8300000, guid: ab77a87422540b44493f7d9311c0000a, type: 3}
   drawingComplete: {fileID: 0}
