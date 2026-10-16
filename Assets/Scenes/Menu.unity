@@ -212,7 +212,7 @@ GameObject:
   - component: {fileID: 40960511}
   - component: {fileID: 40960514}
   m_Layer: 5
-  m_Name: Gallery
+  m_Name: Dostig
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4830,7 +4830,6 @@ MonoBehaviour:
     deleteButton: {fileID: 2108558851}
   mainMenuPanel: {fileID: 465578727}
   saveSelectionPanel: {fileID: 273588011}
-  RejimiPanel: {fileID: 0}
 --- !u!4 &1252522368
 Transform:
   m_ObjectHideFlags: 0
@@ -7936,7 +7935,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u0413\u0430\u043B\u0435\u0440\u0435\u044F"
+  m_text: "\u0414\u043E\u0441\u0442\u0438\u0436\u0435\u043D\u0438\u044F"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0415772fefd1d91409e35225f35b7eca, type: 2}
   m_sharedMaterial: {fileID: 7615368655677610605, guid: 0415772fefd1d91409e35225f35b7eca, type: 2}

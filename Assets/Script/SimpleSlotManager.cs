@@ -17,7 +17,6 @@ public class SimpleSlotManager : MonoBehaviour
     public SaveSlotUI[] saveSlots;
     public GameObject mainMenuPanel;
     public GameObject saveSelectionPanel;
-    public GameObject RejimiPanel;
 
     void Start()
     {
@@ -46,41 +45,32 @@ public class SimpleSlotManager : MonoBehaviour
 
         if (!slotExists)
         {
-            // Создаем новое сохранение
             CreateNewSlot(slotIndex);
         }
 
         PlayerPrefs.SetInt("CurrentSaveSlot", slotIndex);
         PlayerPrefs.Save();
 
-        Debug.Log($"Выбран слот: {slotIndex}");
-
-        // Переходим к выбору режима
+        // Переходим к карте уровней
         saveSelectionPanel.SetActive(false);
-        RejimiPanel.SetActive(true);
+        UnityEngine.SceneManagement.SceneManager.LoadScene("LevelMap"); // или панель
     }
 
     // Удаление слота
     public void DeleteSlot(int slotIndex)
     {
-        // Удаляем все данные слота - БИТВА
-        for (int i = 1; i <= 17; i++)
+        // Удаляем прогресс уровней
+        for (int i = 1; i <= 5; i++) // 5 уровней
         {
-            PlayerPrefs.DeleteKey($"Slot_{slotIndex}_Battle_Level_{i}_stars");
-            PlayerPrefs.DeleteKey($"Slot_{slotIndex}_Battle_Level_{i}_completed");
+            PlayerPrefs.DeleteKey($"Slot_{slotIndex}_Level_{i}_Completed");
+            PlayerPrefs.DeleteKey($"Slot_{slotIndex}_Level_{i}_Correct");
+            PlayerPrefs.DeleteKey($"Slot_{slotIndex}_Level_{i}_Wrong");
         }
 
-        // Удаляем все данные слота - РАСКРАСКА (ДОБАВИТЬ)
-        for (int i = 1; i <= 4; i++)
+        // Удаляем достижения
+        for (int i = 1; i <= 5; i++)
         {
-            PlayerPrefs.DeleteKey($"Slot_{slotIndex}_Coloring_Level_{i}_stars");
-            PlayerPrefs.DeleteKey($"Slot_{slotIndex}_Coloring_Level_{i}_completed");
-        }
-
-        // Удаляем все данные галереи (ДОБАВИТЬ)
-        for (int i = 1; i <= 4; i++)
-        {
-            PlayerPrefs.DeleteKey($"Slot_{slotIndex}_Gallery_Level_{i}");
+            PlayerPrefs.DeleteKey($"Slot_{slotIndex}_Achievement_Level_{i}");
         }
 
         PlayerPrefs.DeleteKey($"Slot_{slotIndex}_Exists");
@@ -88,7 +78,6 @@ public class SimpleSlotManager : MonoBehaviour
         PlayerPrefs.Save();
 
         UpdateAllSlotsDisplay();
-        Debug.Log($"Слот {slotIndex} полностью очищен");
     }
 
     // Создание нового слота
@@ -118,10 +107,9 @@ public class SimpleSlotManager : MonoBehaviour
         {
             string slotName = PlayerPrefs.GetString($"Slot_{slotIndex}_Name", $"Сохранение {slotIndex + 1}");
             int completedLevels = CountCompletedLevels(slotIndex);
-            int totalStars = CountTotalStars(slotIndex);
 
             slotUI.slotNameText.text = slotName;
-            slotUI.progressText.text = $"Уровней: {completedLevels}/21\nЗвезд: {totalStars}/63"; // 17+4=21 уровней, 51+12=63 звезды
+            slotUI.progressText.text = $"Уровней: {completedLevels}/5";
             slotUI.deleteButton.SetActive(true);
         }
         else
@@ -132,46 +120,16 @@ public class SimpleSlotManager : MonoBehaviour
         }
     }
 
-    // Подсчет пройденных уровней (ОБНОВИТЬ)
+    // Подсчет пройденных уровней
     int CountCompletedLevels(int slotIndex)
     {
         int count = 0;
-
-        // Уровни битвы (17)
-        for (int i = 1; i <= 17; i++)
+        for (int i = 1; i <= 5; i++)
         {
-            if (PlayerPrefs.GetInt($"Slot_{slotIndex}_Battle_Level_{i}_completed", 0) == 1)
+            if (PlayerPrefs.GetInt($"Slot_{slotIndex}_Level_{i}_Completed", 0) == 1)
                 count++;
         }
-
-        // Уровни раскраски (4) - ДОБАВИТЬ
-        for (int i = 1; i <= 4; i++)
-        {
-            if (PlayerPrefs.GetInt($"Slot_{slotIndex}_Coloring_Level_{i}_completed", 0) == 1)
-                count++;
-        }
-
         return count;
-    }
-
-    // Подсчет общего количества звезд (ОБНОВИТЬ)
-    int CountTotalStars(int slotIndex)
-    {
-        int total = 0;
-
-        // Звезды уровней битвы
-        for (int i = 1; i <= 17; i++)
-        {
-            total += PlayerPrefs.GetInt($"Slot_{slotIndex}_Battle_Level_{i}_stars", 0);
-        }
-
-        // Звезды уровней раскраски - ДОБАВИТЬ
-        for (int i = 1; i <= 4; i++)
-        {
-            total += PlayerPrefs.GetInt($"Slot_{slotIndex}_Coloring_Level_{i}_stars", 0);
-        }
-
-        return total;
     }
 
     // Получить текущий выбранный слот
