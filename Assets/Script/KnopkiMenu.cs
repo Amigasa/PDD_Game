@@ -9,16 +9,11 @@ public class KnopkiMenu : MonoBehaviour
 {
     [SerializeField] private GameObject SavePanel;
     [SerializeField] private GameObject MenuPanel;
-    [SerializeField] private GameObject RejimiPanel;
     [SerializeField] private GameObject SettingPanel;
 
     public void ShowGallery()
     {
         SceneManager.LoadScene(4);
-    }
-    public void StartTutorial()
-    {
-        SceneManager.LoadScene(14);
     }
 
     public void BackFromGallery()
@@ -28,11 +23,6 @@ public class KnopkiMenu : MonoBehaviour
     void Update()
     {
 
-    }
-    public void Ex()// нопка назад дл€ выхода в меню
-    {
-        RejimiPanel.SetActive(false);
-        SavePanel.SetActive(true);
     }
     public void OnSettingsButtonClick()
     {
@@ -51,9 +41,5 @@ public class KnopkiMenu : MonoBehaviour
     public void Man()
     {
         SceneManager.LoadScene(1);
-    }
-    public void Woman()
-    {
-        SceneManager.LoadScene(2);
     }
 }

@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class SimpleSlotManager : MonoBehaviour
 {
@@ -17,6 +18,10 @@ public class SimpleSlotManager : MonoBehaviour
     public SaveSlotUI[] saveSlots;
     public GameObject mainMenuPanel;
     public GameObject saveSelectionPanel;
+
+    [Header("Level Settings")]
+    public int totalLevels = 5;
+    public int totalAchievements = 5;
 
     void Start()
     {
@@ -45,30 +50,32 @@ public class SimpleSlotManager : MonoBehaviour
 
         if (!slotExists)
         {
+            // Создаем новое сохранение
             CreateNewSlot(slotIndex);
         }
 
         PlayerPrefs.SetInt("CurrentSaveSlot", slotIndex);
         PlayerPrefs.Save();
 
-        // Переходим к карте уровней
-        saveSelectionPanel.SetActive(false);
-        UnityEngine.SceneManagement.SceneManager.LoadScene("LevelMap"); // или панель
+        Debug.Log($"Выбран слот: {slotIndex}");
+
+        // Переходим СРАЗУ на карту уровней
+        SceneManager.LoadScene("Man"); // Убедись, что сцена так называется в Build Settings
     }
 
     // Удаление слота
     public void DeleteSlot(int slotIndex)
     {
-        // Удаляем прогресс уровней
-        for (int i = 1; i <= 5; i++) // 5 уровней
+        // Удаляем все данные слотов (уровни и достижения)
+        for (int i = 1; i <= totalLevels; i++)
         {
-            PlayerPrefs.DeleteKey($"Slot_{slotIndex}_Level_{i}_Completed");
+            PlayerPrefs.DeleteKey($"Slot_{slotIndex}_Level_{i}_stars");
+            PlayerPrefs.DeleteKey($"Slot_{slotIndex}_Level_{i}_completed");
             PlayerPrefs.DeleteKey($"Slot_{slotIndex}_Level_{i}_Correct");
             PlayerPrefs.DeleteKey($"Slot_{slotIndex}_Level_{i}_Wrong");
         }
 
-        // Удаляем достижения
-        for (int i = 1; i <= 5; i++)
+        for (int i = 1; i <= totalAchievements; i++)
         {
             PlayerPrefs.DeleteKey($"Slot_{slotIndex}_Achievement_Level_{i}");
         }
@@ -78,6 +85,7 @@ public class SimpleSlotManager : MonoBehaviour
         PlayerPrefs.Save();
 
         UpdateAllSlotsDisplay();
+        Debug.Log($"Слот {slotIndex} полностью очищен");
     }
 
     // Создание нового слота
@@ -107,16 +115,21 @@ public class SimpleSlotManager : MonoBehaviour
         {
             string slotName = PlayerPrefs.GetString($"Slot_{slotIndex}_Name", $"Сохранение {slotIndex + 1}");
             int completedLevels = CountCompletedLevels(slotIndex);
+            int completedAchievements = CountAchievements(slotIndex);
 
             slotUI.slotNameText.text = slotName;
-            slotUI.progressText.text = $"Уровней: {completedLevels}/5";
-            slotUI.deleteButton.SetActive(true);
+            slotUI.progressText.text = $"Уровней: {completedLevels}/{totalLevels}\nДостижений: {completedAchievements}/{totalAchievements}";
+
+            if (slotUI.deleteButton != null)
+                slotUI.deleteButton.SetActive(true);
         }
         else
         {
             slotUI.slotNameText.text = $"Сохранение {slotIndex + 1}";
             slotUI.progressText.text = "Новое сохранение";
-            slotUI.deleteButton.SetActive(false);
+
+            if (slotUI.deleteButton != null)
+                slotUI.deleteButton.SetActive(false);
         }
     }
 
@@ -124,9 +137,21 @@ public class SimpleSlotManager : MonoBehaviour
     int CountCompletedLevels(int slotIndex)
     {
         int count = 0;
-        for (int i = 1; i <= 5; i++)
+        for (int i = 1; i <= totalLevels; i++)
         {
-            if (PlayerPrefs.GetInt($"Slot_{slotIndex}_Level_{i}_Completed", 0) == 1)
+            if (PlayerPrefs.GetInt($"Slot_{slotIndex}_Level_{i}_completed", 0) == 1)
+                count++;
+        }
+        return count;
+    }
+
+    // Подсчет полученных достижений
+    int CountAchievements(int slotIndex)
+    {
+        int count = 0;
+        for (int i = 1; i <= totalAchievements; i++)
+        {
+            if (PlayerPrefs.GetInt($"Slot_{slotIndex}_Achievement_Level_{i}", 0) == 1)
                 count++;
         }
         return count;
