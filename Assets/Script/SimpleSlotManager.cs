@@ -60,7 +60,7 @@ public class SimpleSlotManager : MonoBehaviour
         Debug.Log($"Выбран слот: {slotIndex}");
 
         // Переходим СРАЗУ на карту уровней
-        SceneManager.LoadScene("Man"); // Убедись, что сцена так называется в Build Settings
+        SceneManager.LoadScene("LevelMap"); // Убедись, что сцена так называется в Build Settings
     }
 
     // Удаление слота

@@ -723,9 +723,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1758300188}
-        m_TargetAssemblyTypeName: GalleryManager, Assembly-CSharp
-        m_MethodName: BackToMenu
+      - m_Target: {fileID: 1758300190}
+        m_TargetAssemblyTypeName: KnopkiMenu, Assembly-CSharp
+        m_MethodName: BackFromGallery
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -933,6 +933,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1758300189}
   - component: {fileID: 1758300188}
+  - component: {fileID: 1758300190}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -952,43 +953,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89b4abe6957dd59498d423329db1555b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  galleryButtons:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  galleryImage:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  lockIcons:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  emptyText: {fileID: 0}
-  drawingSprites:
-  - {fileID: 21300000, guid: 2b303b5ea1c3caa4c8b4371ac105334f, type: 3}
-  - {fileID: 21300000, guid: 2b303b5ea1c3caa4c8b4371ac105334f, type: 3}
-  - {fileID: 21300000, guid: 2b303b5ea1c3caa4c8b4371ac105334f, type: 3}
-  - {fileID: 21300000, guid: 2b303b5ea1c3caa4c8b4371ac105334f, type: 3}
-  - {fileID: 21300000, guid: 2b303b5ea1c3caa4c8b4371ac105334f, type: 3}
-  - {fileID: 21300000, guid: 2b303b5ea1c3caa4c8b4371ac105334f, type: 3}
-  - {fileID: 21300000, guid: 2b303b5ea1c3caa4c8b4371ac105334f, type: 3}
-  - {fileID: 21300000, guid: 2b303b5ea1c3caa4c8b4371ac105334f, type: 3}
 --- !u!4 &1758300189
 Transform:
   m_ObjectHideFlags: 0
@@ -1004,6 +968,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1758300190
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1758300187}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1c66c6b0bad4ba4f91893eac13021c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SavePanel: {fileID: 0}
+  MenuPanel: {fileID: 0}
+  SettingPanel: {fileID: 0}
 --- !u!1 &1812562950
 GameObject:
   m_ObjectHideFlags: 0

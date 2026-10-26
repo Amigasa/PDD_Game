@@ -15,10 +15,10 @@ public class LevelSelectionManager : MonoBehaviour
         public TMP_Text levelText;
 
         [Header("Спрайты кнопки")]
-        public Sprite grayButtonSprite;   // Серая (уровень закрыт)
-        public Sprite redButtonSprite;    // Красная (открыт, но не пройден)
-        public Sprite redPressedSprite;   // Красная нажатая (для анимации)
-        public Sprite greenButtonSprite;  // Зелёная (пройден)
+        public Sprite grayButtonSprite;
+        public Sprite redButtonSprite;
+        public Sprite redPressedSprite;
+        public Sprite greenButtonSprite;
     }
 
     [Header("Level Settings")]
@@ -26,19 +26,24 @@ public class LevelSelectionManager : MonoBehaviour
 
     [Header("Звуки")]
     public AudioSource audioSource;
-    public AudioClip buttonPressSound;   // Звук нажатия
-    public AudioClip buttonGreenSound;   // Звук успеха
+    public AudioClip buttonPressSound;
+    public AudioClip buttonGreenSound;
 
     void Start()
     {
         RefreshAllLevels();
 
-        // Проверяем, не вернулись ли мы после прохождения уровня
         int justCompleted = PlayerPrefs.GetInt("JustCompletedLevel", -1);
+
         if (justCompleted > 0)
         {
-            // Запускаем анимацию для только что пройденного уровня
-            StartCoroutine(AnimateButtonPress(justCompleted - 1));
+            int levelIndex = justCompleted - 1;
+            if (levelIndex >= 0 && levelIndex < levels.Length)
+            {
+                levels[levelIndex].buttonImage.sprite = levels[levelIndex].redPressedSprite;
+                StartCoroutine(AnimateButtonPress(levelIndex));
+            }
+
             PlayerPrefs.DeleteKey("JustCompletedLevel");
             PlayerPrefs.Save();
         }
@@ -60,11 +65,9 @@ public class LevelSelectionManager : MonoBehaviour
         bool completed = PlayerPrefs.GetInt($"Slot_{currentSlot}_Level_{levelIndex + 1}_completed", 0) == 1;
         bool unlocked = IsLevelUnlocked(levelIndex);
 
-        // Текст уровня
         if (level.levelText != null)
             level.levelText.text = (levelIndex + 1).ToString();
 
-        // Спрайт кнопки
         if (level.buttonImage != null)
         {
             if (!unlocked)
@@ -75,25 +78,20 @@ public class LevelSelectionManager : MonoBehaviour
                 level.buttonImage.sprite = level.redButtonSprite;
         }
 
-        // Кнопка активна, если уровень открыт
         if (level.levelButton != null)
             level.levelButton.interactable = unlocked;
     }
 
-    // Анимация нажатия (Красная -> Нажатая -> Зелёная) после прохождения уровня
     IEnumerator AnimateButtonPress(int levelIndex)
     {
         LevelInfo level = levels[levelIndex];
         if (level.buttonImage == null) yield break;
 
-        // 1. Ставим красную нажатую
-        level.buttonImage.sprite = level.redPressedSprite;
         if (audioSource != null && buttonPressSound != null)
             audioSource.PlayOneShot(buttonPressSound);
 
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.4f);
 
-        // 2. Ставим зелёную
         level.buttonImage.sprite = level.greenButtonSprite;
         if (audioSource != null && buttonGreenSound != null)
             audioSource.PlayOneShot(buttonGreenSound);
@@ -101,7 +99,7 @@ public class LevelSelectionManager : MonoBehaviour
 
     bool IsLevelUnlocked(int levelIndex)
     {
-        if (levelIndex == 0) return true; // 1 уровень всегда открыт
+        if (levelIndex == 0) return true;
         int currentSlot = PlayerPrefs.GetInt("CurrentSaveSlot", 0);
         return PlayerPrefs.GetInt($"Slot_{currentSlot}_Level_{levelIndex}_completed", 0) == 1;
     }
@@ -111,7 +109,6 @@ public class LevelSelectionManager : MonoBehaviour
         if (levelIndex < 0 || levelIndex >= levels.Length) return;
         if (!IsLevelUnlocked(levelIndex)) return;
 
-        // Запускаем анимацию и загрузку через корутину
         StartCoroutine(LoadLevelWithAnimation(levelIndex));
     }
 
@@ -119,18 +116,14 @@ public class LevelSelectionManager : MonoBehaviour
     {
         LevelInfo level = levels[levelIndex];
 
-        // 1. Показываем нажатую кнопку
         if (level.buttonImage != null)
             level.buttonImage.sprite = level.redPressedSprite;
 
-        // 2. Играем звук нажатия (если есть)
         if (audioSource != null && buttonPressSound != null)
             audioSource.PlayOneShot(buttonPressSound);
 
-        // 3. Ждем 0.3 секунды (чтобы анимация была видна)
         yield return new WaitForSeconds(0.3f);
 
-        // 4. Только теперь сохраняем прогресс и грузим сцену
         PlayerPrefs.SetInt("CurrentLevel", levelIndex + 1);
         PlayerPrefs.Save();
 

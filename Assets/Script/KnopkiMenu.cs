@@ -13,7 +13,7 @@ public class KnopkiMenu : MonoBehaviour
 
     public void ShowGallery()
     {
-        SceneManager.LoadScene(4);
+        SceneManager.LoadScene(2);
     }
 
     public void BackFromGallery()

@@ -146,7 +146,7 @@ public class AudioManager : MonoBehaviour
             case "Tutorial":
                 PlayTutorialMusic();
                 break;
-            case "Man":
+            case "LevelMap":
                 PlayBattleMapMusic();
                 break;
             case "Woman":
